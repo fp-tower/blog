@@ -1,101 +1,60 @@
 +++
-title = "Selecting the right fonts and colors"
-image = "featured.jpg"
+title = "State of Monocle"
+image = "monocle-logo.png"
 author = "julien truffaut"
-tags = ["programming", "test"]
-date = 2019-12-23T07:52:24+00:00
+tags = ["scala", "monocle"]
+date = 2019-12-30T00:00:00+00:00
 +++
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Monocle, like many other Scala FP libraries, was inspired by Haskell. In our case, it is the Lens library by 
+Edward Kmett and al.
+
+In Monocle, we experimented with various optics encoding: pair of functions, Van Laarhoven, and profunctor
+(see [LensImpl](https://github.com/julien-truffaut/LensImpl)). The JVM and Haskell runtime are hugely different, and an 
+encoding that works well in Haskell can be inefficient in Scala. For example, Haskell relies on zero cost wrapper (newtype)
+to effectively select typeclass instances, but we don't have an equivalent in Scala/JVM yet (opaque types may help). 
+You can find some of the benchmarks we made for Lenses in 2015 here.
+
+However, something we didn't do very well was to adapt the API to the specificity of Scala. If you look at Monocle
+1.x or 2.x, it has the same interface as Haskell Lens but expressed in a much more clunky way. The example of this can
+be seen in optics composition, i.e. how we build complex optics out of simpler ones.
+
 
 ``` scala
-> scala
-This is a Scala shell.
-Type in expressions to have them evaluated.
-Type :help for more information.
+case class Person(name: String, address: Address)
 
-scala> object HelloWorld {
-    |   def main(args: Array[String]): Unit = {
-    |     println("Hello, world!")
-    |   }
-    | }
-defined module HelloWorld
+case class Address(
+  streetNumber: Int, 
+  postCode: String, 
+  county: Option[String]
+)
 
-scala> HelloWorld.main(Array())
-Hello, world!
+// Assume we have:
+// address a Lens[Person, Address] and 
+// county a Lens[Address, Option[String]]
 
-scala>:q
->
+address . county . _Some // Haskell Lens
+address.composeLens(county).composePrism(some) // Scala Monocle
 ```
 
 
-```scala
-object CoinChange {
+They are two main reasons why Monocle doesn't have such a nice interface as Haskell Lens:
 
-  /**
-    *
-    * @param coins   - a list of integers i.e. change coins
-    * @param money   - the target amount
-    * @return - number of combinations possible to get the amount
-    */
+* Optics in Lens are aliases for fancy functions, e.g. `type Lens a b = functor f => (b -> f b) -> a -> f a`. So optics
+composition is "just" function composition (`.` in Haskell). We cannot use this encoding in Scala 2; we would
+ need [polymorphic functions](https://github.com/lampepfl/dotty/pull/4672) which we may have in Scala 3.
 
-  def coinChange(coins: List[Int], money: Int): Int = {
-    val combinations :Array[Int] = new Array[Int](money+1)
+* Almost all optics compose together (see [table](http://julien-truffaut.github.io/Monocle/optics.html#optic-composition-table)).
+We could define overloaded compose methods, one for each valid combination of optics. Unfortunately, there is a bug in
+Scala 2 that makes the type inference weaker with overloaded methods (see [issue](https://github.com/julien-truffaut/Monocle/issues/417)).
+There is an easy workaround; we can use non-overloaded compose methods, e.g. composeLens, composePrism, composeIso, etc.
+The type inference now works, but the API is much more verbose. Fortunately, Dotty fixed this issue so we can expect a
+single overloaded compose method in Monocle for Scala 3.
 
-    combinations(0) = 1
+In September, we quicked out the development of a new major version for [Monocle](https://github.com/julien-truffaut/Monocle/issues/714). 
+The main goal of Monocle v3 is to make the API user-friendly. To do this, we will rewrite the library from scratch and try
+to leverage Scala features such as inheritance, class methods, and variance. More in my next post, stay tuned.
 
-    for (coin <- coins) {
-      for (i <- coin to money) {
-        if (i >= coin) {
-          combinations(i) += combinations(i-coin)
-        }
-      }
-    }
-
-    combinations(money)
-  }
-}
-```
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-
-{{< video "VBklW8fsB2U" >}}
-
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-
-## Heading Here
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-
-![](/images/photo-1522071820081-009f0129c71c.jpeg)
-
-### Sub Heading Here
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamc.
-
-<!-- caption -->
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamc.
-
-### Sub Heading Here
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamc.
-
-#### Sub Sub Heading Here
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamc.
-
-> “Dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exerc.”
-
-### Sub Sub Heading Here
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamc.
-
-| Header Cell | Header Cell  |
-|:----------|:-------------|
-| Deveeprasad Acharya | Baltimore |
-| Jumaima Al Nour | Karachi  |
-| Bonelwa Ngqawana | Dakar |
-| Leanne Simpson | Taipei |
-| Frank Boehm | Pretoria |
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamc.
+If you would like to participate in the development of Monocle, we are always looking for new contributors and active
+maintainers. You don't necessarily need to be an expert in optics. We also need help to create benchmarks, documentation,
+tutorials, and general API feedback.
