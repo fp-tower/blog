@@ -3,7 +3,7 @@ title = "State of Monocle"
 image = "monocle-logo.png"
 author = "julien truffaut"
 tags = ["scala", "monocle"]
-date = 2019-12-30T00:00:00+00:00
+date = 2019-01-02T00:00:00+00:00
 +++
 
 [Monocle](https://github.com/julien-truffaut/Monocle), like many other Scala FP libraries, was inspired by Haskell.
