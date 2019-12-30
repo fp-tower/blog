@@ -3,10 +3,10 @@ title = "State of Monocle"
 image = "monocle-logo.png"
 author = "julien truffaut"
 tags = ["scala", "monocle"]
-date = 2019-01-02T00:00:00+00:00
+date = 2019-12-30T00:00:00+00:00
 +++
 
-[Monocle](https://github.com/julien-truffaut/Monocle), like many other Scala FP libraries, was inspired by Haskell.
+[Monocle](https://github.com/julien-truffaut/Monocle), like many other Scala functional libraries, was inspired by Haskell.
 In our case, it is the [Lens](https://hackage.haskell.org/package/lens) library by Edward Kmett and al.
 
 In Monocle, we experimented with various optics encoding: pair of functions, Van Laarhoven, and profunctor
@@ -49,17 +49,52 @@ All optics in Haskell Lens are type aliases for fancy functions, e.g.
  type Traversal a b = Applicative f => (b -> f b) -> a -> f a
 ``` 
 
-The entire library is designed, such as optics composition is "just" function composition (`.` in Haskell).
+The entire Haskell library is designed for optics composition to be "just" function composition (`.` in Haskell).
 It also means one can define an optic without depending on thes Lens library. Unfortunately, we cannot use this
 encoding in Scala 2; we would need polymorphic functions which 
 we may have in [Scala 3](   (https://github.com/lampepfl/dotty/pull/4672)).
 
 ### 2. Overloaded methods have type inference issues 
 
-Almost all optics compose together (see [table](http://julien-truffaut.github.io/Monocle/optics.html#optic-composition-table)).
-We could define overloaded compose methods, one for each valid combination of optics. Sadly, there is a bug in
-Scala 2 that makes the type inference weaker with overloaded methods (see [issue](https://github.com/julien-truffaut/Monocle/issues/417)).
-There is an easy workaround; we can use non-overloaded compose methods, e.g. composeLens, composePrism, composeIso, etc.
+Almost all optics compose together, see table:
+
+
+|               | Fold       | Getter     | Setter     | Traversal    | Optional   | Prism      | Lens       | Iso        |
+| ------------- |:----------:|:----------:|:----------:|:------------:|:----------:|:----------:|:----------:|:----------:|
+| **Fold**      | **Fold**   | Fold       | Fold       | Fold         | Fold       | Fold       | Fold       | Fold       |
+| **Getter**    | Fold       | **Getter** | -          | Fold         | Fold       | Fold       | Getter     | Getter     |
+| **Setter**    | -          | -          | **Setter** | Setter       | Setter     | Setter     | Setter     | Setter     |
+| **Traversal** | Fold       | Fold       | Setter     |**Traversal** | Traversal  | Traversal  | Traversal  | Traversal  |
+| **Optional**  | Fold       | Fold       | Setter     | Traversal    |**Optional**| Optional   | Optional   | Optional   |
+| **Prism**     | Fold       | Fold       | Setter     | Traversal    | Optional   | **Prism**  | Optional   | Prism      |
+| **Lens**      | Fold       | Getter     | Setter     | Traversal    | Optional   | Optional   |**Lens**    | Lens       |
+| **Iso**       | Fold       | Getter     | Setter     | Traversal    | Optional   | Prism      | Lens       |**Iso**     |
+
+We could define overloaded compose methods, one for each valid combination of optics. 
+
+```scala
+trait Lens[A, B] {
+  def compose[C](other:      Iso[B, C]):     Lens[A, C] = ???
+  def compose[C](other:     Lens[B, C]):     Lens[A, C] = ???
+  def compose[C](other:    Prism[B, C]): Optional[A, C] = ???
+  def compose[C](other: Optional[B, C]): Optional[A, C] = ???
+  // ...
+}
+```
+
+Sadly, there is a bug in Scala 2 that makes the type inference weaker with overloaded methods (see [issue](https://github.com/julien-truffaut/Monocle/issues/417)).
+There is an easy workaround; we can use non-overloaded compose methods, e.g.
+
+```scala
+trait Lens[A, B] {
+  def composeIso[C]     (other:      Iso[B, C]):     Lens[A, C] = ???
+  def composeLens[C]    (other:     Lens[B, C]):     Lens[A, C] = ???
+  def composePrism[C]   (other:    Prism[B, C]): Optional[A, C] = ???
+  def composeOptional[C](other: Optional[B, C]): Optional[A, C] = ???
+  // ...
+}
+```
+
 The type inference now works, but the API is much more verbose. Fortunately, Dotty fixed this issue so we can expect a
 single overloaded compose method in Monocle for Scala 3.
 
