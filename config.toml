@@ -1,6 +1,6 @@
 baseURL = "/"
 languageCode = "en"
-title = "Fp-tower blog"
+title = "fp-tower blog"
 paginate = 7
 dynamicURL = "/"
 
