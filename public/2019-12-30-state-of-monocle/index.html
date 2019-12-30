@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head><title>State of Monocle | Fp-tower blog</title>
+<meta charset='utf-8'>
+<meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+<meta http-equiv = 'X-UA-Compatible' content = 'IE=edge'>
+<meta name = 'SKYPE_TOOLBAR' content = 'SKYPE_TOOLBAR_PARSER_COMPATIBLE' />
+<meta name = 'keywords' content = 'Fp-tower blog'>
+<meta property = 'og:locale' content = 'en_US' />
+<meta property = 'og:type' content = 'article' />
+<meta property = 'og:title' content = 'State of Monocle' />
+<meta property = 'og:description' content = 'Monocle, like many other Scala FP libraries, was inspired by Haskell. In our case, it is the Lens library by Edward Kmett and al.
+In Monocle, we …'>
+<meta property = 'og:url' content = '/2019-12-30-state-of-monocle/' />
+
+<link rel=icon href="/images/apple-coach-logo-only.svg" sizes="any" type="image/svg+xml">
+<link rel="apple-touch-icon" sizes="180x180" href = '/images/icons/apple-touch-icon.png'>
+<link rel="icon" type="image/png" sizes="32x32" href = '/images/icons/favicon-32x32.png'>
+<link rel="icon" type="image/png" sizes="16x16" href= '/images/icons/favicon-16x16.png'>
+<link rel='canonical' href="/2019-12-30-state-of-monocle/">
+<link rel = 'stylesheet' href = '/main.ba28760b08f01ce9a951435a9889eb1e87b15236b15260fadcdbb437091476dd788c615391891300df50cf5bb89724babca1f2e709e0c38a34173e764abfd047.css' integrity = 'sha512-uih2CwjwHOmpUUNamInrHoexUjaxUmD63Nu0NwkUdt14jGFTkYkTAN9Qz1u4lyS6vKHy5wngw4o0Fz52Sr/QRw=='>
+
+  </head>
+	<body>
+<header class = 'nav_header'>
+  <div class = 'nav_top wrap'>
+    <a class = 'nav_brand' href='/'>
+      <img src = '/images/logo-white.png' class = 'nav_logo'>
+    </a>
+    <nav class = 'nav center'>
+      <a href = '/' class = 'nav_item '>
+        home
+      </a>
+    </nav>
+    <div class = 'nav_toggle'>&#9776;</div>
+  </div>
+</header>
+
+    <main>
+<div class = 'grid-reverse wrap pt_4'>
+  <div class = 'contents'>
+    <h1>State of Monocle</h1>
+    
+<div class = 'author'>
+  <div class = 'avatar'>
+    <img src = '/images/julien-truffaut.jpg'>
+  </div>
+  <div class = 'author_intro'>
+    <h3 class = 'author_name'><a href = 'https://twitter.com/JulienTruffaut' target = '_blank' rel = 'noopener' title = 'Julien Truffaut linkedin'>julien truffaut <span class = 'tag'>follow</span></a></h3>
+    <p class = 'date'>30 Dec . 3 min read</p>
+  </div>
+</div>
+
+    <img src = '/images/monocle-logo.png' alt = 'State of Monocle'><p>Monocle, like many other Scala FP libraries, was inspired by Haskell. In our case, it is the Lens library by
+Edward Kmett and al.</p>
+<p>In Monocle, we experimented with various optics encoding: pair of functions, Van Laarhoven, and profunctor
+(see <a href="https://github.com/julien-truffaut/LensImpl">LensImpl</a>). The JVM and Haskell runtime are hugely different, and an
+encoding that works well in Haskell can be inefficient in Scala. For example, Haskell relies on zero cost wrapper (newtype)
+to effectively select typeclass instances, but we don't have an equivalent in Scala/JVM yet (opaque types may help).
+You can find some of the benchmarks we made for Lenses in 2015 here.</p>
+<p>However, something we didn't do very well was to adapt the API to the specificity of Scala. If you look at Monocle
+1.x or 2.x, it has the same interface as Haskell Lens but expressed in a much more clunky way. The example of this can
+be seen in optics composition, i.e. how we build complex optics out of simpler ones.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-scala" data-lang="scala"><span class="k">case</span> <span class="k">class</span> <span class="nc">Person</span><span class="o">(</span><span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">address</span><span class="k">:</span> <span class="kt">Address</span><span class="o">)</span>
+
+<span class="k">case</span> <span class="k">class</span> <span class="nc">Address</span><span class="o">(</span>
+  <span class="n">streetNumber</span><span class="k">:</span> <span class="kt">Int</span><span class="o">,</span> 
+  <span class="n">postCode</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> 
+  <span class="n">county</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span>
+<span class="o">)</span>
+
+<span class="c1">// Assume we have:
+</span><span class="c1"></span><span class="c1">// address a Lens[Person, Address] and 
+</span><span class="c1"></span><span class="c1">// county a Lens[Address, Option[String]]
+</span><span class="c1"></span>
+<span class="n">address</span> <span class="o">.</span> <span class="n">county</span> <span class="o">.</span> <span class="nc">_Some</span> <span class="c1">// Haskell Lens
+</span><span class="c1"></span><span class="n">address</span><span class="o">.</span><span class="n">composeLens</span><span class="o">(</span><span class="n">county</span><span class="o">)</span><span class="o">.</span><span class="n">composePrism</span><span class="o">(</span><span class="n">some</span><span class="o">)</span> <span class="c1">// Scala Monocle
+</span></code></pre></td></tr></table>
+</div>
+</div><p>They are two main reasons why Monocle doesn't have such a nice interface as Haskell Lens:</p>
+<ul>
+<li>
+<p>Optics in Lens are aliases for fancy functions, e.g. <code>type Lens a b = functor f =&gt; (b -&gt; f b) -&gt; a -&gt; f a</code>. So optics
+composition is &quot;just&quot; function composition (<code>.</code> in Haskell). We cannot use this encoding in Scala 2; we would
+need <a href="https://github.com/lampepfl/dotty/pull/4672">polymorphic functions</a> which we may have in Scala 3.</p>
+</li>
+<li>
+<p>Almost all optics compose together (see <a href="http://julien-truffaut.github.io/Monocle/optics.html#optic-composition-table">table</a>).
+We could define overloaded compose methods, one for each valid combination of optics. Unfortunately, there is a bug in
+Scala 2 that makes the type inference weaker with overloaded methods (see <a href="https://github.com/julien-truffaut/Monocle/issues/417">issue</a>).
+There is an easy workaround; we can use non-overloaded compose methods, e.g. composeLens, composePrism, composeIso, etc.
+The type inference now works, but the API is much more verbose. Fortunately, Dotty fixed this issue so we can expect a
+single overloaded compose method in Monocle for Scala 3.</p>
+</li>
+</ul>
+<p>In September, we quicked out the development of a new major version for <a href="https://github.com/julien-truffaut/Monocle/issues/714">Monocle</a>.
+The main goal of Monocle v3 is to make the API user-friendly. To do this, we will rewrite the library from scratch and try
+to leverage Scala features such as inheritance, class methods, and variance. More in my next post, stay tuned.</p>
+<p>If you would like to participate in the development of Monocle, we are always looking for new contributors and active
+maintainers. You don't necessarily need to be an expert in optics. We also need help to create benchmarks, documentation,
+tutorials, and general API feedback.</p>
+
+  </div>
+  <aside class = 'pt_1 aside'>
+    <div class = 'aside_widget'>
+      <h3 class = 'mb_1'>Tags</h3>
+<div class = 'tags'>
+  
+  <a href = '/tags/scala' class = 'tag'>scala</a>
+   
+  <a href = '/tags/monocle' class = 'tag'>monocle</a>
+   
+</div>
+
+
+      <h3 class = 'mt_1'>Learn FP in Scala</h3>
+      <p>
+        Are you interested in learning functional programming in Scala? <a href ='https://github.com/fp-tower/foundation'>Take our course Foundation</a>
+      </p>
+    </div>
+  </aside>
+</div>
+    </main>
+<footer class = 'footer'>
+  <ul class = 'wrap footer_inner'>
+    <div>
+      © 2019 Truffaut Consultancy LTD. All rights reserved
+    </div>
+    <div class  = 'social_icons'>
+    
+      <a href = 'https://github.com/julien-truffaut' target = '_blank' rel = 'noopener' title = 'follow on github' class = 'social_icon github'></a>
+    
+      <a href = 'https://www.linkedin.com/in/julientruffaut/' target = '_blank' rel = 'noopener' title = 'follow on linkedin' class = 'social_icon linkedin'></a>
+    
+      <a href = 'https://twitter.com/JulienTruffaut' target = '_blank' rel = 'noopener' title = 'follow on twitter' class = 'social_icon twitter'></a>
+    
+      <a href = 'https://www.reddit.com/user/julien-truffaut' target = '_blank' rel = 'noopener' title = 'follow on reddit' class = 'social_icon reddit'></a>
+    
+    </div>
+  </ul>
+</footer>
+
+    <script src = '/js/index.js'></script>
+
+  </body>
+</html>
