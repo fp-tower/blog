@@ -51,8 +51,7 @@ All optics in Haskell Lens are type aliases for fancy functions, e.g.
 
 The entire Haskell library is designed for optics composition to be "just" function composition (`.` in Haskell).
 It also means one can define an optic without depending on thes Lens library. Unfortunately, we cannot use this
-encoding in Scala 2; we would need polymorphic functions which 
-we may have in [Scala 3](   (https://github.com/lampepfl/dotty/pull/4672)).
+encoding in Scala 2; we would need polymorphic functions which we may have in [Scala 3](https://github.com/lampepfl/dotty/pull/4672).
 
 ### 2. Overloaded methods have type inference issues 
 
