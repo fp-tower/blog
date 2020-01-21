@@ -40,8 +40,8 @@ def index[K, V](key: K): Optional[Map[K, V], V] =
     def getOption(from: Map[K, V]): Option[V] =
       from.get(key)
 
-    def replace(to: V)(from: Map[K, V]): Map[K, V] =
-      if(from.contains(key)) from + (key -> to) 
+    def replace(to: V, from: Map[K, V]): Map[K, V] =
+      if(from.contains(key)) from + (key -> to)
       else from
   }
 
@@ -75,19 +75,27 @@ index("bob").modifyOption(_ + 1, users)
 Most importantly, `Optional` composes such as you can easily access nested data structure.
 
 ```scala
-trait Optional[From, To]  { 
+trait Optional[From, To] { self =>
   def getOption(from: From): Option[To]
   def replace(to: To, from: From): From
   
-  @alpha("andThen") 
-  def >>>[Next](other: Optional[To, Next]): Optional[From, Next]
+  @alpha("andThen")
+  def >>>[Next](other: Optional[To, Next]): Optional[From, Next] =
+    new Optional[From, Next] {
+      def getOption(from: From): Option[Next] =
+        self.getOption(from).flatMap(other.getOption)
+  
+      def replace(to: Next, from: From): From =
+        self.getOption(from)
+          .map(other.replace(to, _))
+          .fold(from)(self.replace(_, from))
+    }
 }
 
-val users: Map[String, Map[String, String]] = 
-  Map(
-    Map("john"  -> Map("name" -> "John Doe"  , "email" -> "john@foo.com"), 
-    Map("marie" -> Map("name" -> "Marie Acme")
-  )
+val users: Map[String, Map[String, String]] = Map(
+  "john"  -> Map("name" -> "John Doe"  , "email" -> "john@foo.com"),
+  "marie" -> Map("name" -> "Marie Acme")
+)
 
 (index("john" ) >>> index("email")).getOption(users)
 // res8: Option[String] = Some("john@foo.com")
@@ -98,8 +106,8 @@ val users: Map[String, Map[String, String]] =
 
 (index("john") >>> index("email")).replace("john@gmail.com", users) 
 // res11: Map[String, Map[String, String]] = Map(
-//   Map("john"  -> Map("name" -> "John Doe", "email" -> "john@gmail.com"), 
-//   Map("marie" -> Map("name" -> "Marie Acme")
+//   "john"  -> Map("name" -> "John Doe"  , "email" -> "john@gmail.com"),
+//   "marie" -> Map("name" -> "Marie Acme")
 // )
 ```
 
@@ -130,7 +138,7 @@ def index[K, V](key: K): Optional[Map[K, V], V] =
     def getOrError(from: Map[K, V]): Either[String, To] =
       from.get(key).toRight(s"Key $key is missing")
 
-    def replace(to: V)(from: Map[K, V]): Map[K, V] =
+    def replace(to: V, from: Map[K, V]): Map[K, V] =
       if(from.contains(key)) from + (key -> to) 
       else from
   }
