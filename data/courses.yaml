@@ -1,0 +1,5 @@
+- name: Scala Foundation
+  title: Learn FP in Scala
+  description: |
+    Are you interested in learning functional programming in Scala? [Take our course](#)
+  image: foundation.png
