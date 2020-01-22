@@ -13,9 +13,11 @@
       {{- partial "tags.html" . }}
       {{ $courseID := .Params.course }}
       {{ $course := index (where $.Site.Data.courses ".name" $courseID) 0 }}
-      <h3 class = 'mt_1'>{{ $course.title }}</h3>
-      <p>{{ $course.description | markdownify }}</p>
-      <img src = '/images/{{ $course.image }}' alt = '{{ $course.name }}' class = 'logo'>
+      <section class = 'course'>
+        <h3>{{ $course.title }}</h3>
+        <p>{{ $course.description | markdownify }}</p>
+        <img src = '/images/{{ $course.image }}' alt = '{{ $course.name }}' class = 'logo'>
+      </section>
     </div>
   </aside>
 </div>

@@ -446,3 +446,11 @@ $sites:  "reddit", "github", "twitter", "linkedin";
     text-align: left;
   }
 }
+
+.course {
+  text-align: center;
+  background: $haze;
+  padding: 1.5rem 1rem;
+  margin-top: 1.5rem;
+  border-radius: 0.2rem;
+}
