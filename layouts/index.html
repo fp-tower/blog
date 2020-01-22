@@ -15,7 +15,11 @@
 <section class = 'wrap'>
   <h2 class = 'center mb_1'>Blog Articles</h2>
   <div class = 'grid-3'>
-    {{- range .Paginator.Pages }}
+    {{- $pages := $.Site.RegularPages }}
+    {{- $nonDrafts := where $pages "Params.index" "!=" "false" }}
+    {{- $nonFuturePosts := where $pages "Date" "<=" "now" }}
+    {{ $paginator := .Paginate (uniq ( union $nonDrafts $nonFuturePosts)) }}
+    {{- range $paginator.Pages }}
     {{ partial "excerpt.html" . }}
     {{- end }}
   </div>
