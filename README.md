@@ -27,7 +27,7 @@ There are two approaches of achieving this:
 
 2. Publish a future dated post. Since hugo [doesn't generate future authored posts by default](https://gohugo.io/getting-started/usage/#draft-future-and-expired-content), you would have to be explicit with hugo. 
 
-    If using [netlify to build your site](https://gohugo.io/hosting-and-deployment/hosting-on-netlify/) ,for example, you would alter add the following line in the `netlify.toml` [script](https://gohugo.io/hosting-and-deployment/hosting-on-netlify/)
+    If using [netlify to build your site](https://gohugo.io/hosting-and-deployment/hosting-on-netlify/) ,for example, you would add the following line in the `netlify.toml` [script](https://gohugo.io/hosting-and-deployment/hosting-on-netlify/)
 
     ```
     HUGO_BUILDFUTURE = "true"
