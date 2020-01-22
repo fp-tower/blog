@@ -4,6 +4,7 @@ image = "monocle-logo.png"
 author = "julien truffaut"
 tags = ["scala", "monocle"]
 date = 2019-12-30T00:00:00+00:00
+course = "Scala Foundation"
 +++
 
 [Monocle](https://github.com/julien-truffaut/Monocle), like many other Scala functional libraries, was inspired by Haskell.

@@ -11,11 +11,11 @@
     <div class = 'aside_widget'>
       <h3 class = 'mb_1'>Tags</h3>
       {{- partial "tags.html" . }}
-      <h3 class = 'mt_1'>Learn FP in Scala</h3>
-      <p>
-        Are you interested in learning functional programming in Scala? Take our course
-      </p>
-      <img src = '/images/foundation.png' alt = '{{ .Site.Title }} logo' class = 'logo'>
+      {{ $courseID := .Params.course }}
+      {{ $course := index (where $.Site.Data.courses ".name" $courseID) 0 }}
+      <h3 class = 'mt_1'>{{ $course.title }}</h3>
+      <p>{{ $course.description | markdownify }}</p>
+      <img src = '/images/{{ $course.image }}' alt = '{{ $course.name }}' class = 'logo'>
     </div>
   </aside>
 </div>
