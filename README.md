@@ -32,3 +32,15 @@ There are two approaches of achieving this:
     ```
     HUGO_BUILDFUTURE = "true"
     ``` 
+
+## Publish New Course
+
+Add the course in the `course.yaml` in the `data` directory
+
+Then from your post add a `course` field in the front matter that matches whatever the **name** of your course is.
+
+## Add new page with front matter fields pre-filled
+
+```zsh
+hugo new title-of-new-page.md
+```
