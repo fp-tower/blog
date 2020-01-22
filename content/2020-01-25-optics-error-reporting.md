@@ -1,18 +1,19 @@
 +++
-title = "Error reporting with optics"
+title = "Introducing error reporting in optics"
 image = "error-reporting.jpg"
 author = "julien truffaut"
 tags = ["scala", "monocle"]
 date = 2020-01-07T00:00:00+00:00
+index = false
 +++
 
-A frequently requested feature is the ability to report why an optic failed. It is particularly crucial when you build a sophisticated optic. Say you have a large configuration document, and you want to focus on `kafka.topics.order-events.partitions`. There may not be a `partitions` key, or if it exists, it may have an unexpected format, e.g. it is a String instead of an Int. In Monocle 2.x and other optics libraries, we cannot provide any details about the failure. In this blog post, I would like to present my experiments with a new optics encoding that supports detailed error reporting and almost reduce by half the optics hierarchy!
+A frequently requested feature is the ability to report why an optic failed. It is particularly crucial when you build a sophisticated optic. Say you have a large configuration document, and you want to focus on `kafka.topics.order-events.partitions`. There may not be a `partitions` key, or if it exists, it may have an unexpected format, e.g. it is a String instead of an Int. In Monocle 2.x and other optics libraries, we cannot provide any details about the failure. In this blog post, I would like to discuss my experiments with a new optics encoding that supports detailed error reporting. In particular, I will present a step-by-step refactoring of one specific type of optic such as you can see the failed attempts as well as the final solution.
 
-This article is written using [Dotty](https://dotty.epfl.ch/) `0.21.0-RC1`. Dotty will soon become [Scala 3](https://www.scala-lang.org/blog/2018/04/19/scala-3.html).
+This article is written using [Dotty](https://dotty.epfl.ch/) `0.21.0-RC1`. All code is available in the following GitHub [repository](https://github.com/julien-truffaut/blog-error-reporting/tree/master/src/main/scala).
 
-## Optional
+## Optional overview
 
-An `Optional` (aka Affined Traversal) is an optics used to access a section (`To`) of a larger object (`From`). 
+An `Optional` (aka Affine Traversal) is an optics used to access a section (`To`) of a larger object (`From`). 
 As the name implies, the area targeted by an `Optional` may be missing, which makes it a good use case to discuss error 
 reporting. Here is the interface of an Optional. 
 
@@ -23,53 +24,61 @@ trait Optional[From, To] {
 }
 ```
 
-The interface follows three main rules:
-1. if `getOption(from) == None`, then `replace(x, from) == from`.
-1. if `getOption(from) == Some(x)`, then `replace(x, from) == from` . 
-1. if `getOption(from) == Some(x)`, then `getOption(replace(y, from)) == Some(y)` . 
-
-These three rules ensure that if an `Optional` gives you access to some value, then you can only modify this particular 
-section and nothing else. Perhaps surprisingly, an `Optional` doesn't let you insert data; you can only change some values 
-that already exist.
-
-Now, let's have a look at some `Optional` use cases.
+Unsurprisingly, we can use an `Optional` to access an optional field in a class.
 
 ```scala
-def index[K, V](key: K): Optional[Map[K, V], V] =
-  new Optional[Map[K, V], V] {
-    def getOption(from: Map[K, V]): Option[V] =
-      from.get(key)
+case class User(name: String, age: Int, email: Option[String])
 
-    def replace(to: V, from: Map[K, V]): Map[K, V] =
-      if(from.contains(key)) from + (key -> to)
-      else from
-  }
+val email: Optional[User, String] = ...
+
+val john = User("John Doe", 23, Some("john@foo.com"))
+
+email.getOption(john)
+// res0: Option[String] = Some(john@foo.com)
+email.replace("john@doe.com", john)
+// res1: User = User(John Doe, 23, Some(john@doe.com))
+```
+
+We can also build an `Optional` to target any value in a `Map`.
+
+```scala
+def index[K, V](key: K): Optional[Map[K, V], V] = ...
 
 val users: Map[String, Int] = Map("john" -> 23, "marie" -> 34)
 
 index("john").getOption(users)
-// res0: Option[Int] = Some(23)
+// res2: Option[Int] = Some(23)
 index("bob").getOption(users) 
-// res1: Option[Int] = None
-
+// res3: Option[Int] = None
 index("john").replace(20, users)
-// res2: Map[String, Int] = Map("john" -> 20, "marie" -> 34)
-index("bob").replace(20, users) // no-op 
-// res3: Map[String, Int] = Map("john" -> 23, "marie" -> 34) 
+// res4: Map[String, Int] = Map(john -> 20, marie -> 34)
+```
+
+The interface follow three rules which ensure that if an `Optional` gives access to some value, then you can only modify this particular 
+section and nothing else. These following rules are generally checked using property based testing:
+1. if `getOption(from) == None`, then `replace(x, from) == from`.
+1. if `getOption(from) == Some(x)`, then `replace(x, from) == from` . 
+1. if `getOption(from) == Some(x)`, then `getOption(replace(y, from)) == Some(y)` . 
+
+Perhaps surprisingly, an `Optional` does not let you insert data. You can only change values that already exist, as this example shows.
+
+```scala
+index("bob").replace(45, users)
+// res5: Map[String, Int] = Map(john -> 23, marie -> 34)
 ```
 
 `Optional` offers a rich API with more than a dozen useful combinators. For example, `modify` and `modifyOption` allow you to apply a function on the target.
 
 ```scala
-index("john").modify(_ + 1, users)
-// res4: Map[String, Int] = Map("john" -> 24, "marie" -> 34) 
-index("bob").modify(_ + 1, users)
-// res5: Map[String, Int] = Map("john" -> 23, "marie" -> 34) 
+index("john").modify(_ * 2, users)
+// res6: Map[String, Int] = Map(john -> 46, marie -> 34) 
+index("bob").modify(_ * 2, users)
+// res7: Map[String, Int] = Map(john -> 23, marie -> 34) 
 
-index("john").modifyOption(_ + 1, users)
-// res6: Option[Map[String, Int]] = Some(Map("john" -> 24, "marie" -> 34)) 
-index("bob").modifyOption(_ + 1, users)
-// res7: Option[Map[String, Int]] = None
+index("john").modifyOption(_ * 2, users)
+// res8: Option[Map[String, Int]] = Some(Map(john -> 46, marie -> 34)) 
+index("bob").modifyOption(_ * 2, users)
+// res9: Option[Map[String, Int]] = None
 ```
 
 Most importantly, `Optional` composes such as you can easily access nested data structure.
@@ -79,76 +88,63 @@ trait Optional[From, To] { self =>
   def getOption(from: From): Option[To]
   def replace(to: To, from: From): From
   
-  @alpha("andThen")
-  def >>>[Next](other: Optional[To, Next]): Optional[From, Next] =
-    new Optional[From, Next] {
-      def getOption(from: From): Option[Next] =
-        self.getOption(from).flatMap(other.getOption)
-  
-      def replace(to: Next, from: From): From =
-        self.getOption(from)
-          .map(other.replace(to, _))
-          .fold(from)(self.replace(_, from))
-    }
+  def >>>[Next](other: Optional[To, Next]): Optional[From, Next] = ...
 }
 
-val users: Map[String, Map[String, String]] = Map(
-  "john"  -> Map("name" -> "John Doe"  , "email" -> "john@foo.com"),
-  "marie" -> Map("name" -> "Marie Acme")
+val users: Map[String, User] = Map(
+  "john"  -> User("John Doe"  , 23, Some("john@foo.com")),
+  "marie" -> User("Marie Acme", 34, None)
 )
 
-(index("john" ) >>> index("email")).getOption(users)
-// res8: Option[String] = Some("john@foo.com")
-(index("marie") >>> index("email")).getOption(users)
-// res9: Option[String] = None
-(index("bob") >>> index("name")).getOption(users) 
-// res10: Option[String] = None
+(index("john" ) >>> email).getOption(users)
+// res10: Option[String] = Some(john@foo.com)
+(index("marie") >>> email).getOption(users)
+// res11: Option[String] = None
+(index("bob") >>> email).getOption(users) 
+// res12: Option[String] = None
 
-(index("john") >>> index("email")).replace("john@gmail.com", users) 
-// res11: Map[String, Map[String, String]] = Map(
-//   "john"  -> Map("name" -> "John Doe"  , "email" -> "john@gmail.com"),
-//   "marie" -> Map("name" -> "Marie Acme")
+(index("john") >>> email).replace("john@doe.com", users) 
+// res13: Map[String, User] = Map(
+//   "john"  -> User(John Doe  , 23, Some(john@doe.com)),
+//   "marie" -> User(Marie Acme, 34, None)
 // )
 ```
 
-Both `index("marie") >>> index("email")` and `index("bob") >>> index("name")` fail with `users` as input. The former because 
-`marie` doesn't have an `email` and the latter because `bob` is not a valid user. However, we have no way to distinguish 
+Both `index("marie") >>> email` and `index("bob") >>> email` fail with `users` as input. The former because 
+`marie` doesn't have an email and the latter because `bob` is not a valid user. However, we have no way to distinguish 
 these two cases.
 
 The issue is that `Optional` returns an `Option` which doesn't provide any details when it fails. If we want to report 
-a precise error message, we need to use something like `Either`, but the question is, what should be the type of the error 
-message? Let's start with something simple like `String` and see how far can we go.
+a precise error message, we need to use something like `Either`. The question is then, what should be the type of the error 
+message? Let's start with something simple like `String` and see how far we can go.
 
 ## Optional with String error
 
 We only need to change the signature of `getOption` to return an `Either[String, From]`. Let's also use that occasion to rename 
-the method to `getOrError`.
+this method to `getOrError`. 
 
 ```scala
 trait Optional[From, To] { 
   def getOrError(from: From): Either[String, To]
   def replace(to: To, from: From): From
   
-  @alpha("andThen") 
-  def >>>[Next](other: Optional[To, Next]): Optional[From, Next]
+  def >>>[Next](other: Optional[To, Next]): Optional[From, Next] = ...
 }
 
-def index[K, V](key: K): Optional[Map[K, V], V] =
-  new Optional[Map[K, V], V] {
-    def getOrError(from: Map[K, V]): Either[String, To] =
-      from.get(key).toRight(s"Key $key is missing")
+val email = new Optional[User, String] {
+  def getOrError(from: User): Either[String, String] =
+    from.email.toRight("email is missing")
 
-    def replace(to: V, from: Map[K, V]): Map[K, V] =
-      if(from.contains(key)) from + (key -> to) 
-      else from
-  }
+  def replace(to: String, from: User): User =
+    if(from.email.isDefined) from.copy(email = Some(to)) else from
+}
 
-(index("john" ) >>> index("email")).getOrError(users)
-// res12: Either[String, String] = Right("john@foo.com")
-(index("marie") >>> index("email")).getOrError(users)
-// res13: Either[String, String] = Left("Key email is missing")
-(index("bob")   >>> index("name") ).getOrError(users)
-// res14: Either[String, String] = Left("Key bob is missing")
+(index("john" ) >>> email).getOrError(users)
+// res14: Either[String, String] = Right(john@foo.com)
+(index("marie") >>> email).getOrError(users)
+// res15: Either[String, String] = Left(email is missing)
+(index("bob")   >>> email).getOrError(users)
+// res16: Either[String, String] = Left(Key bob is missing)
 ```
 
 Yeah! That wasn't so difficult. We can even define `getOption` in terms of `getOrError` for backward compatibility.
@@ -168,32 +164,20 @@ an error message.
 
 ```scala
 (index("users") >>> index("john") >>> index("age")).getOrError(users)
-// res15: Either[(Path, String), String] = Left((users.john, "missing field age"))
-```
-
-Someone else may want to define a custom enumeration to describe the failure such as it is easier to test.
-                                                            
-```scala
-enum CustomFailure {
-  case MissingKey(key: String)
-  case InvalidFormat(key: String, expected: Format, actual: Format)
-}
-
-(index("users") >>> index("john") >>> index("age")).getOrError(users)
-// res16: Either[CustomFailure, String] = Left(InvalidFormat("age", Number, String))
+// res17: Either[(Path, String), String] = Left((users.john, "missing field age"))
 ```
 
 ## Optional with custom error
 
-If we want the error type to be fully customisable by users, it needs to be a type parameter of `Optional`.
+If we want the error type to be fully customisable by users, it needs to be a type parameter of `Optional`, e.g. 
+`Optional[String, User, Email]` or `Optional[CustomError, User, Email]`.
 
 ```scala
 trait Optional[Error, From, To]  { 
   def getOrError(from: From): Either[Error, To]
   def replace(to: To, from: From): From
  
-  @alpha("andThen") 
-  def >>>[Next](other: Optional[Error, To, Next]): Optional[Error, From, Next]
+  def >>>[Next](other: Optional[Error, To, Next]): Optional[Error, From, Next] = ...
 }
 ```
 
@@ -205,20 +189,41 @@ enum Config {
   case StringConfig(value: String)
   case ObjectConfig(value: Map[String, Config])
 }
+
+val config: Config = ObjectConfig(Map(
+  "john"  -> ObjectConfig(Map(
+    "name"  -> StringConfig("John Doe"),
+    "age"   -> IntConfig(23)
+  )),
+  "marie" -> ObjectConfig(Map(
+    "name"  -> StringConfig("Marie Acme"),
+    "age"   -> StringConfig("forty-three")
+  ))
+))
 ```
 
-And corresponding `Optional` with custom failure type.
+
+When we access a config, we can experience mainly two types of failure. Either the data is missing, or it is an unexpected 
+format, e.g. we want an Int, but there is a String.
 
 ```scala
 enum ConfigFailure {
   case MissingKey(key: String)
   case InvalidFormat(expectedFormat: String, actual: Config)
 }
+```
 
+Now, we can define one `Optional` that attempts to parse a generic `Config` into an `Int`, `String`, or `Object`.
+
+```scala
 val int: Optional[InvalidFormat, Config, Int] = ???
 val str: Optional[InvalidFormat, Config, String] = ???
 val obj: Optional[InvalidFormat, Config, Map[String, Config]] = ???
+```
 
+Finally
+
+```scala
 def index[A](key: String): Optional[MissingKey, Map[String, A], A] = ???
 
 int.getOrError(IntConfig(12))
@@ -244,7 +249,6 @@ trait Optional[+Error, From, To]  {
   def getOrError(from: From): Either[Error, To]
   def replace(to: To, from: From): From
 
-  @alpha("andThen") 
-  def >>>[NewError >: Error, Next](other: Optional[NewError, To, Next]): Optional[NewError, From, Next]
+  def >>>[NewError >: Error, Next](other: Optional[NewError, To, Next]): Optional[NewError, From, Next] = ...
 }
 ```
