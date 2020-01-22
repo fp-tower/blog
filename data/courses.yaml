@@ -1,6 +1,6 @@
 - name: Scala Foundation
   title: Learn FP in Scala
   description: |
-    Are you interested in learning functional programming in Scala? [Take our course](#)
+    Are you interested in learning functional programming in Scala? [Take our course](https://github.com/fp-tower/foundation)
     
-    [![Foundation Course Logo](/images/foundation.png)](https://github.com/fp-tower/foundation/blob/master/logo/Foundation.png)
+    [![Foundation Course Logo](/images/foundation.png)](https://github.com/fp-tower/foundation)
