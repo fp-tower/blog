@@ -23,7 +23,7 @@ code {
     color: $dark !important;
     border-radius: 4px;
     width: 100%;
-    display: block;
+    display: grid;
     max-width: 100%;
     // overflow-x: scroll !important;
   }
@@ -35,6 +35,7 @@ code {
     width: 100%;
     // overflow-x: scroll;
     border: none;
+    padding: 0.5rem;
     &:first-child {
       background-color: $bg;
       &, pre {
