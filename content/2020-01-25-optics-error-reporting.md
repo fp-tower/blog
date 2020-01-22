@@ -165,7 +165,8 @@ an error message.
 
 ```scala
 (index("users") >>> index("john") >>> index("age")).getOrError(users)
-// res17: Either[(Path, String), String] = Left((users.john, "missing field age"))
+// res17: Either[(Path, String), String] = 
+//   Left((users.john, "missing field age"))
 ```
 
 ## Optional with custom error
@@ -204,8 +205,8 @@ val config: Config = ObjectConfig(Map(
 ```
 
 
-When we access a config, we can experience mainly two types of failure. Either the data is missing, or it is an unexpected 
-format, e.g. we want an Int, but there is a String.
+When we access a `Config`, we can experience two types of failure. Either the data is missing, or it is an unexpected 
+format, e.g. we want an `Int`, but it is a `String`. Let's also use an enum to encode that.
 
 ```scala
 enum ConfigFailure {
@@ -214,42 +215,33 @@ enum ConfigFailure {
 }
 ```
 
-Now, we can define one `Optional` that attempts to parse a generic `Config` into an `Int`, `String`, or `Object`.
+Now, we can define `Optionals` that parse a generic `Config` into each data type: `Int`, `String`, or `Object` (these 
+could be `Prism`, a more precise optic). We can also adapt `index` to fail with a `MissingKey` error.
 
 ```scala
 val int: Optional[InvalidFormat, Config, Int] = ???
 val str: Optional[InvalidFormat, Config, String] = ???
 val obj: Optional[InvalidFormat, Config, Map[String, Config]] = ???
-```
 
-Finally
-
-```scala
 def index[A](key: String): Optional[MissingKey, Map[String, A], A] = ???
 
 int.getOrError(IntConfig(12))
-// res17: Either[InvalidFormat, Int] = Right(12)
+// res18: Either[InvalidFormat, Int] = Right(12)
 
 int.getOrError(StringConfig("hello"))
-// res18: Either[InvalidFormat, Int] = Left(InvalidFormat("Int", StringConfig("hello")))
+// res19: Either[InvalidFormat, Int] = 
+//   Left(InvalidFormat(Int,StringConfig(hello)))
 
 index("users").getOrError(Map.empty)
-// res18: Either[MissingKey, Int] = Left(MissingKey("users")))
+// res20: Either[MissingKey, Int] = 
+//   Left(MissingKey(users))
 ```
 
-We are able to define precise error type for all our `Optional`. In theory, we should be able to define 
+However, if we try to combine these optics we get the following failure:
 
 ```scala
 obj >>> index("users") >>> obj >>> index("john") >>> obj >>> index("age") >>> int
-```
-
-`Optional` is covariant in `Error` because `Error` only appear in return type of 
-
-```scala
-trait Optional[+Error, From, To]  { 
-  def getOrError(from: From): Either[Error, To]
-  def replace(to: To, from: From): From
-
-  def >>>[NewError >: Error, Next](other: Optional[NewError, To, Next]): Optional[NewError, From, Next] = ...
-}
+                                   ^^^^^^^^^^^^         
+Found:    Optional[MissingKey   , Map[String, Nothing], Nothing]
+Required: Optional[InvalidFormat, Map[String, Config ], Next]
 ```
