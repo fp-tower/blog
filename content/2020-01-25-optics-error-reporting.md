@@ -101,10 +101,10 @@ val users: Map[String, User] = Map(
 // res10: Option[String] = Some(john@foo.com)
 (index("marie") >>> email).getOption(users)
 // res11: Option[String] = None
-(index("bob") >>> email).getOption(users) 
+(index("bob"  ) >>> email).getOption(users) 
 // res12: Option[String] = None
 
-(index("john") >>> email).replace("john@doe.com", users) 
+(index("john" ) >>> email).replace("john@doe.com", users) 
 // res13: Map[String, User] = Map(
 //   "john"  -> User(John Doe  , 23, Some(john@doe.com)),
 //   "marie" -> User(Marie Acme, 34, None)
@@ -144,7 +144,7 @@ val email = new Optional[User, String] {
 // res14: Either[String, String] = Right(john@foo.com)
 (index("marie") >>> email).getOrError(users)
 // res15: Either[String, String] = Left(email is missing)
-(index("bob")   >>> email).getOrError(users)
+(index("bob"  ) >>> email).getOrError(users)
 // res16: Either[String, String] = Left(Key bob is missing)
 ```
 
@@ -237,11 +237,12 @@ index("users").getOrError(Map.empty)
 //   Left(MissingKey(users))
 ```
 
-However, if we try to combine these optics we get the following failure:
+However, if we try to combine these optics we get the following failure.
 
 ```scala
 obj >>> index("users") >>> obj >>> index("john") >>> obj >>> index("age") >>> int
                                    ^^^^^^^^^^^^         
+Type Mismatch Error:
 Found:    Optional[MissingKey   , Map[String, Nothing], Nothing]
 Required: Optional[InvalidFormat, Map[String, Config ], Next]
 ```
