@@ -61,7 +61,7 @@ index("john").replace(20, users)
 // res4: Map[String, Int] = Map(john -> 20, marie -> 34)
 ```
 
-The interface follow three rules which ensure if an `Optional` successfully accesses a value, then it can only 
+The interfaces follow three rules which ensure that if an `Optional` successfully accesses a value, then it can only 
 modify this particular section of the larger object and nothing else. These rules are generally checked using property based testing:
 1. if `getOption(from) == Some(x)`, then `replace(x, from) == from` . 
 1. if `getOption(from) == Some(x)`, then `getOption(replace(y, from)) == Some(y)` . 
@@ -272,7 +272,7 @@ trait Optional[+Error, From, To] {
 }
 ```
 
-`>>>` signature is a bit scary, so let's go through `>>>` one example.
+`>>>` signature is a bit scary, let's go through an example.
 
 ```scala
 val obj: Optional[InvalidFormat, Config, Map[String, Config]] = ...
@@ -344,7 +344,7 @@ reporting to Haskell Lens, but the main issue seems to be related to type infere
 
 In my next blog post, I will explore the impact of error reporting on the rest of the optics hierarchy, e.g. can we return errors 
 with other optics like `Prism` and `Traversal`? How can we add error reporting without breaking existing code (signature 
-has changed)? What does it mean for `Optional` to have `Nothing` has error type? Surprisingly, we will see that variance 
+has changed)? What does it mean for `Optional` to have `Nothing` as error type? Surprisingly, we will see that variance 
 and inheritance combine exceptionally well together and offer a compelling optics encoding.
 
 Stay tuned. In the meantime, you can follow me on [twitter](https://twitter.com/JulienTruffaut) or discuss this article on reddit.
