@@ -11,7 +11,7 @@ course = "Scala Foundation"
 A frequently requested feature is the ability to report why an optic failed. It is particularly crucial when you build a 
 sophisticated optic. Say you have a large configuration document, and you want to focus on `kafka.topics.order-events.partitions`. 
 There may not be a `partitions` key, or if it exists, it may have an unexpected format, e.g. it is a String instead of an Int. 
-In [Monocle](https://julien-truffaut.github.io/Monocle/) and other optics libraries, we cannot provide any details about 
+In [Monocle](https://julien-truffaut.github.io/Monocle/) and other optics libraries, we currently cannot provide any details about 
 the failure. In this blog post, I will discuss my experiments with a new optics encoding that supports detailed error reporting. 
 In particular, I will present a step-by-step refactoring of one specific type of optic such as you can see the intermediate 
 attempts as well as the final solution.
@@ -61,8 +61,8 @@ index("john").replace(20, users)
 // res4: Map[String, Int] = Map(john -> 20, marie -> 34)
 ```
 
-The interface follow three rules which ensure if an `Optional` successfully gives access to some value, then you can only 
-modify this particular section and nothing else. These rules are generally checked using property based testing:
+The interface follow three rules which ensure if an `Optional` successfully accesses a value, then it can only 
+modify this particular section of the larger object and nothing else. These rules are generally checked using property based testing:
 1. if `getOption(from) == Some(x)`, then `replace(x, from) == from` . 
 1. if `getOption(from) == Some(x)`, then `getOption(replace(y, from)) == Some(y)` . 
 1. if `getOption(from) == None`, then `replace(x, from) == from`.
@@ -197,7 +197,7 @@ enum ConfigFailure {
 ```
 
 Now, we can define a few `Optionals` that parse a generic `Config` into each data type: `Int`, `String`, or `Object`. 
-These `Optionals` can only fail because the config type is incorrect, so let's use a precise `InvalidFormat` error.
+These `Optionals` can only fail because the config type is incorrect, so let's use a specific `InvalidFormat` error.
  
 ```scala
 val int: Optional[InvalidFormat, Config, Int] = ...
@@ -212,22 +212,23 @@ int.getOrError(StringConfig("hello"))
 //   Left(InvalidFormat(Int,StringConfig(hello)))
 ```
 
-If you are familiar with optics hierarchy, you may have noticed that `int`, `str` and `obj` could be a `Prism`, a more 
-specific optics. However, `Optional` works fine too, so let's keep things simple. 
+If you are familiar with optics hierarchy, you may have noticed that `int`, `str` and `obj` could be a `Prism` (a more 
+specific optics). However, `Optional` works fine too, so let's keep things simple. 
 Next step, we can adapt `index` to return a `MissingKey` error.
 
 ```scala
-def index[A](key: String): Optional[MissingKey, Map[String, A], A] = ...
+def index(key: String): Optional[MissingKey, Map[String, Config], Config] = ...
 
 index("bob").getOrError(Map.empty)
 // res20: Either[MissingKey, Int] = Left(MissingKey(bob))
 ```
 
-Finally, let's combine `obj` and `index` into a `property` optics such as we can have a friendly syntax to access nested
-`Config` objects.
+Finally, let's define an optics called `property` such as we can have a friendly syntax to access nested `Config` objects.
 
 ```scala
-property("john" ) >>> property("age") >>> int
+property("john") >>> property("age") >>> int
+
+property("marie") >>> property("name") >>> str
 ```
 
 `Property` checks if a `Config` is an `Object`, and then it focuses into a key of the `Map`. The error type of `property` 
@@ -248,18 +249,18 @@ Regrettably, the compiler rejects composing `obj` and `index` together because t
 and `InvalidFormat` are both `ConfigFailure`, but `>>>` is too strict. It requires both sides of `>>>` to have exactly the same error. 
 There are two solutions to this problem:
 1. We update the definition of `obj` and `index` to use `ConfigFailure` instead of a more specialised error.
-1. We use variance on the error type of `Optional`.
+1. We use variance on the error type of `Optional`, and let the compiler automatically adapt the error type when required.
 
 
 Historically, in the functional programming side of Scala, variance had a lousy reputation. However, libraries like [fs2](https://fs2.io/) 
-or [ZIO](https://zio.dev/) recently demonstrated variance offers a great user experience in terms of [type inference](https://mpilquist.github.io/blog/2018/07/04/fs2/). 
+or [ZIO](https://zio.dev/) recently demonstrated that variance offers a great user experience in terms of [type inference](https://mpilquist.github.io/blog/2018/07/04/fs2/). 
 The implementation is slightly more complicated, but it is completely acceptable if end-users enjoy a better experience.
 
 ## Optional with covariant error
 
 Variance is quite tricky to grasp. Fortunately, the compiler is here to help us. If we ever use the wrong variance annotation, 
-the compiler will let us know and usually give us some useful suggestions. In our case, `Optional` is covariant
-(`+`) in `Error` because `Error` is only in return types of `Optional` methods.
+the compiler will let us know and usually give us some suggestions. In our case, we can deduce `Optional` is covariant (`+`) 
+in `Error` because the two core methods of `Optional`: `getOrError` and `replace`, only mention `Error` in their output.
  
 ```scala
 trait Optional[+Error, From, To] {
@@ -271,7 +272,7 @@ trait Optional[+Error, From, To] {
 }
 ```
 
-Let's go through `>>>` signature with an example.
+`>>>` signature is a bit scary, so let's go through `>>>` one example.
 
 ```scala
 val obj: Optional[InvalidFormat, Config, Map[String, Config]] = ...
@@ -289,10 +290,10 @@ upcast `index` error to satisfy the constraint (see types in green).
 ![ConfigFailure hierarchy](/images/diagrams/config-failure-hierarchy.svg)
 
 `ConfigFailure`, `AnyRef`, or `Any` are all valid options. The compiler has some heuristics to determine which 
-type should be inferred. In this case, it is the lower bound `ConfigFailure`, see this [presentation](https://www.youtube.com/watch?v=lMvOykNQ4zs) 
+type should be inferred. In this case, it chose the lower bound `ConfigFailure`, see this [presentation](https://www.youtube.com/watch?v=lMvOykNQ4zs) 
 from Guillaume Martres for more details about type inference.
 
-Now, let's go back to our use case.
+Now, let's go back to our main use case.
 
 ```scala
 def property(key: String): Optional[ConfigFailure, Config, Config] =
@@ -318,8 +319,8 @@ val config: Config = ObjectConfig(Map(
 // res23: Either[MissingKey, Int] = Left(MissingKey(bob))
 ```
 
-Perfect. Type inference works, and we have precise error types. Since we are building an `Optional`, we can as easily
-modify an arbitrary `Config`.
+Perfect. Type inference works, and we kept precise error types. Since we are building an `Optional`, we can as easily
+update an arbitrary `Config`.
 
 ```scala
 (property("john") >>> property("age") >>> int).replace(10, config)
@@ -335,58 +336,15 @@ modify an arbitrary `Config`.
 //))
 ```
 
-This implementation satisfies all our requirements, but what about API compatibility? Many people currently use
-Monocle. Ideally, adding error reporting feature should not break any existing code. Unfortunately, adding an extra type 
-parameter will require all signatures to change. Let's see what we could do.
-
-## Backward compatibility
-
-Most users create `Optional` via optics composition or `Optional.apply` method.
-
-```scala
-object Optional {
-  def apply[From, To](getOption: From => Option[To])(
-    replace: To => From => From): Optional[From, To] = ...
-}
-``` 
-
-We can start by using a different name for our new encoding, e.g. `ErrorOptional`, and then we define a type alias and
-companion object to match the previous `Optional` shape. 
-
-```scala
-trait ErrorOptional[+Error, From, To] { ... }
-
-type Optional[From, To] = ErrorOptional[???, From, To]
-
-object Optional { 
-  def apply[From, To] ... : Optional[From, To]  
-}
-```
-
-The question is, what should be the type of error for previously defined optics? Or another way to formulate it, what's
-an `Optional` with unknown/undefined error type? We could make a case for:
-1. `Unit`, since `Either[Unit, A]` is equivalent to `Option[A]`.
-1. `String`, it is the most common and straightforward error type.
-1. `Any`, we can't introspect it (we can, but we shouldn't).
-
-In my opinion, `Any` is the best choice because it has the lovely property that composing a new `ErrorOptional` with an 
-`Optional` returns an `Optional`. In other words, if any part of a complex optics has an unknown error type, then the
-entire optics has an unknown error type.
-
-```scala
-ErrorOptional[E, A, B] >>> Optional[B, C]: Optional[A, C]
-Optional[A, B] >>> ErrorOptional[E, B, C]: Optional[A, C]
-```
-
 ## Conclusion and future work
 
-I am super excited about this new encoding because it is to my knowledge a novel approach leveraging Scala unique features. 
-There were several [attempts](https://yairchu.github.io/posts/optics-with-error-reporting.html) to add error reporting to Haskell 
-Lens, but the main issue seems to be related to type inference with the rest of the optics hierarchy (see discussion on [coindexing](http://oleg.fi/gists/posts/2017-04-26-indexed-poptics.html#coindexed)). 
-In my opinion, this should not be an issue in Scala as we use inheritance to encode the relationship between optics.
+I am super excited about this new encoding. It is to my knowledge a novel approach leveraging Scala specific features: 
+variance. There were several [attempts](https://yairchu.github.io/posts/optics-with-error-reporting.html) to add error 
+reporting to Haskell Lens, but the main issue seems to be related to type inference (see discussion on [coindexing](http://oleg.fi/gists/posts/2017-04-26-indexed-poptics.html#coindexed)).
 
-In my next blog post, I will explore generalising error reporting to other types of optics like `Prism` or `Traversal`. 
-For example, could we make a `Traversal` either accumulate errors or fail early? More intriguing, what does it mean for an 
-`Optional` or a `Prism` to have `Nothing` has an error of type? (hint: this is equivalent to one the most well-known optics type).
+In my next blog post, I will explore the impact of error reporting on the rest of the optics hierarchy, e.g. can we return errors 
+with other optics like `Prism` and `Traversal`? How can we add error reporting without breaking existing code (signature 
+has changed)? What does it mean for `Optional` to have `Nothing` has error type? Surprisingly, we will see that variance 
+and inheritance combine exceptionally well together and offer a compelling optics encoding.
 
 Stay tuned. In the meantime, you can follow me on [twitter](https://twitter.com/JulienTruffaut) or discuss this article on reddit.
