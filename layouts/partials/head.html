@@ -20,6 +20,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href = '{{ .Site.BaseURL }}images/icons/favicon-32x32.png'>
 <link rel="icon" type="image/png" sizes="16x16" href= '{{ .Site.BaseURL }}images/icons/favicon-16x16.png'>
 <link rel='canonical' href="{{ .Permalink }}">
+<meta property="og:image" content="{{ .Site.BaseURL}}images/logo.png" />
 {{- $options := (dict "targetPath" "main.css" "outputStyle" "expanded" "enableSourceMap" "true") -}}
 {{- $styles := resources.Get "/main.scss" | resources.ToCSS $options | resources.Fingerprint "sha512" }}
 <link rel = 'stylesheet' href = '{{ $styles.Permalink }}' integrity = '{{ $styles.Data.Integrity }}'>
