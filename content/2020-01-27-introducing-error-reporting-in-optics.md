@@ -174,17 +174,16 @@ enum Config {
 }
 
 val config: Config = ObjectConfig(Map(
-  "john"  -> ObjectConfig(Map(
-    "name"  -> StringConfig("John Doe"),
-    "age"   -> IntConfig(23)
+  "http-server" -> ObjectConfig(Map(
+    "hostname" -> StringConfig("localhost"),
+    "port"     -> IntConfig(8080)
   )),
-  "marie" -> ObjectConfig(Map(
-    "name"  -> StringConfig("Marie Acme"),
-    "age"   -> StringConfig("forty-three")
+  "db" -> ObjectConfig(Map(
+    "connection" -> IntConfig(4),
+    "url"        -> StringConfig("jdbc:postgresql://localhost:5432/db")
   ))
 ))
 ```
-
 
 When we access a `Config`, we can experience two kinds of failure. Either the data is missing, or it is an unexpected 
 format, e.g. we want an `Int`, but it is a `String`. Let's also use an enumeration to encode errors.
@@ -219,16 +218,16 @@ Next step, we can adapt `index` to return a `MissingKey` error.
 ```scala
 def index(key: String): Optional[MissingKey, Map[String, Config], Config] = ...
 
-index("bob").getOrError(Map.empty)
-// res20: Either[MissingKey, Int] = Left(MissingKey(bob))
+index("db").getOrError(Map.empty)
+// res20: Either[MissingKey, Int] = Left(MissingKey(db))
 ```
 
 Finally, let's define an optics called `property` such as we can have a friendly syntax to access nested `Config` objects.
 
 ```scala
-property("john") >>> property("age") >>> int
+property("http-server") >>> property("hostname") >>> str
 
-property("marie") >>> property("name") >>> str
+property("db") >>> property("connection") >>> int
 ```
 
 `Property` checks if a `Config` is an `Object`, and then it focuses into a key of the `Map`. The error type of `property` 
@@ -300,38 +299,38 @@ def property(key: String): Optional[ConfigFailure, Config, Config] =
   obj >>> index(key)
 
 val config: Config = ObjectConfig(Map(
-  "john"  -> ObjectConfig(Map(
-    "name"  -> StringConfig("John Doe"),
-    "age"   -> IntConfig(23)
+  "http-server" -> ObjectConfig(Map(
+    "hostname" -> StringConfig("localhost"),
+    "port"     -> IntConfig(8080)
   )),
-  "marie" -> ObjectConfig(Map(
-    "name"  -> StringConfig("Marie Acme"),
-    "age"   -> StringConfig("forty-three")
+  "db" -> ObjectConfig(Map(
+    "connection" -> IntConfig(4),
+    "url"        -> StringConfig("jdbc:postgresql://localhost:5432/db")
   ))
 ))
 
-(property("john" ) >>> property("age") >>> int).getOrError(config)
-// res21: Either[MissingKey, Int] = Right(23)
-(property("marie") >>> property("age") >>> int).getOrError(config)
+(property("http-server") >>> property("port") >>> int).getOrError(config)
+// res21: Either[MissingKey, Int] = Right(8080)
+(property("db") >>> property("connection") >>> str).getOrError(config)
 // res22: Either[MissingKey, Int] = 
-//   Left(InvalidFormat(Int,StringConfig(forty-three)))
-(property("bob") >>> property("age") >>> int).getOrError(config)
-// res23: Either[MissingKey, Int] = Left(MissingKey(bob))
+//   Left(InvalidFormat(String,IntConfig(4)))
+(property("kafka") >>> property("port") >>> int).getOrError(config)
+// res23: Either[MissingKey, Int] = Left(MissingKey(kafka))
 ```
 
 Perfect. Type inference works, and we kept precise error types. Since we are building an `Optional`, we can as easily
 update an arbitrary `Config`.
 
 ```scala
-(property("john") >>> property("age") >>> int).replace(10, config)
+(property("http-server") >>> property("port") >>> int).replace(9000, config)
 // res24: Config = ObjectConfig(Map(
-//  "john"  -> ObjectConfig(Map(
-//    "name"  -> StringConfig("John Doe"),
-//    "age"   -> IntConfig(10)
+//  "http-server" -> ObjectConfig(Map(
+//    "hostname" -> StringConfig("localhost"),
+//    "port"     -> IntConfig(9000)
 //  )),
-//  "marie" -> ObjectConfig(Map(
-//    "name"  -> StringConfig("Marie Acme"),
-//    "age"   -> StringConfig("forty-three")
+//  "db" -> ObjectConfig(Map(
+//    "connection" -> IntConfig(4),
+//    "url"        -> StringConfig("jdbc:postgresql://localhost:5432/db")
 //  ))
 //))
 ```
