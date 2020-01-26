@@ -318,11 +318,75 @@ val config: Config = ObjectConfig(Map(
 // res23: Either[MissingKey, Int] = Left(MissingKey(kafka))
 ```
 
-Perfect. Type inference works, and we kept precise error types. Since we are building an `Optional`, we can as easily
-update an arbitrary `Config`.
+Great, `>>>` lifted automatically the error of `obj` and `index` to `ConfigFailure` which is precisely what we wanted. 
+Can we do better? Are they still some corner cases? 
+
+Imagine we have a third party library like [refined](https://github.com/fthomas/refined/blob/0820276b7cc80390a7cec5ecb353507376167a7f/modules/core/shared/src/main/scala/eu/timepit/refined/types/net.scala#L13), 
+offering an `Optional` to check if an `Int` is a `PortNumber`.
 
 ```scala
-(property("http-server") >>> property("port") >>> int).replace(9000, config)
+val portNumber: Optional[String, Int, PortNumber] = ...
+
+portNumber.getOrError(8080)
+// res24: Either[String, PortNumber] = Right(PortNumber(8080))
+
+portNumber.getOrError(-1)
+// res25: Either[String, PortNumber] = Left("-1 is not a port number")
+```
+
+We may want to use this validation with our configuration DSL. However, `portNumber` uses a generic `String` error message 
+and not our `ConfigFailure` enumeration. So, the type inference algorithm will use the first common parent of 
+`ConfigFailure` and `String` which is a rather useless `Anyref`.
+
+```scala
+property("http-server") >>> property("port") >>> int >>> portNumber
+// res26: Optional[AnyRef, Config, PortNumber]
+```
+
+One could argue we should transform the `String` error message from the third-party library error type to our domain model 
+using something like `mapError`.
+
+```scala
+trait Optional[+Error, From, To] {
+  ...
+  def mapError[NewError](f: Error => NewError)
+   : Optional[NewError, From, Next] = ...
+}
+```
+
+However, it would be better if by default combining two unrelated errors offered a more precise type than `Any` or `AnyRef`. 
+In Scala 2, we are out of luck, but Dotty has some helpful features.
+
+## Composing error with union types
+
+[Union types](https://dotty.epfl.ch/docs/reference/new-types/union-types.html) are a new feature of Dotty. They allow 
+defining the most precise upper bound between two or more types. In our previous example, `String | ConfigFailure` would
+be the best possible type to return when we compose `int >>> portNumber`.
+
+![Union type](/images/diagrams/config-failure-union-type.svg)
+
+We only need to change the signature of `>>>`; the implementation would stay the same. In my opinion, union types 
+simplify the signature of `>>>` since we don't need the constraint `NewError >: Error` anymore.
+
+```scala
+trait Optional[+Error, From, To] {
+  ...
+  def >>>[NewError, Next](other: Optional[NewError, To, Next])
+   : Optional[Error | NewError, From, Next] = ...
+}
+
+(property("http-server") >>> property("port") >>> int >>> portNumber)
+  .getOrError(config)
+// res27: Either[String | ConfigFailure, PortNumber] = 
+//   Right(PortNumber(8080))
+```
+
+Perfect. Type inference works, and we have the most precise error type. Since we are building an `Optional`, we can as quickly
+update an arbitrary `Config` (assuming we have some macro to convert a `9000` literal to `PortNumber`).
+
+```scala
+(property("http-server") >>> property("port") >>> int >>> portNumber)
+  .replace(9000, config)
 // res24: Config = ObjectConfig(Map(
 //  "http-server" -> ObjectConfig(Map(
 //    "hostname" -> StringConfig("localhost"),
@@ -338,12 +402,12 @@ update an arbitrary `Config`.
 ## Conclusion and future work
 
 I am super excited about this new encoding. It is to my knowledge a novel approach leveraging Scala specific features: 
-variance. There were several [attempts](https://yairchu.github.io/posts/optics-with-error-reporting.html) to add error 
-reporting to Haskell Lens, but the main issue seems to be related to type inference (see discussion on [coindexing](http://oleg.fi/gists/posts/2017-04-26-indexed-poptics.html#coindexed)).
+variance and union types. There were several [attempts](https://yairchu.github.io/posts/optics-with-error-reporting.html) 
+to add error reporting to Haskell Lens, but the main issue seems to be related to type inference (see discussion on [coindexing](http://oleg.fi/gists/posts/2017-04-26-indexed-poptics.html#coindexed)).
 
 In my next blog post, I will explore the impact of error reporting on the rest of the optics hierarchy, e.g. can we return errors 
-with other optics like `Prism` and `Traversal`? How can we add error reporting without breaking existing code (signature 
-has changed)? What does it mean for `Optional` to have `Nothing` as error type? Surprisingly, we will see that variance 
-and inheritance combine exceptionally well together and offer a compelling optics encoding.
+with other optics like `Prism` and `Traversal`? How can we add error reporting without breaking existing code? What does 
+it mean for `Optional` to have `Nothing` as error type? Surprisingly, we will see that variance and inheritance combine 
+exceptionally well and offer a compelling optics encoding.
 
 Stay tuned. In the meantime, you can follow me on [twitter](https://twitter.com/JulienTruffaut) or discuss this article on reddit.
