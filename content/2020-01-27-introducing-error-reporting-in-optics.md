@@ -309,12 +309,12 @@ val config: Config = ObjectConfig(Map(
 ))
 
 (property("http-server") >>> property("port") >>> int).getOrError(config)
-// res21: Either[MissingKey, Int] = Right(8080)
+// res21: Either[ConfigFailure, Int] = Right(8080)
 (property("db") >>> property("connection") >>> str).getOrError(config)
-// res22: Either[MissingKey, Int] = 
+// res22: Either[ConfigFailure, Int] = 
 //   Left(InvalidFormat(String,IntConfig(4)))
 (property("kafka") >>> property("port") >>> int).getOrError(config)
-// res23: Either[MissingKey, Int] = Left(MissingKey(kafka))
+// res23: Either[ConfigFailure, Int] = Left(MissingKey(kafka))
 ```
 
 Great, `>>>` lifted automatically the error of `obj` and `index` to `ConfigFailure` which is precisely what we wanted. 
