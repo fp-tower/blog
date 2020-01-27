@@ -409,4 +409,5 @@ with other optics like `Prism` and `Traversal`? How can we add error reporting w
 it mean for `Optional` to have `Nothing` as error type? Surprisingly, we will see that variance and inheritance combine 
 exceptionally well and offer a compelling optics encoding.
 
-Stay tuned. In the meantime, you can follow me on [twitter](https://twitter.com/JulienTruffaut) or discuss this article on reddit.
+Stay tuned. In the meantime, you can follow me on [twitter](https://twitter.com/JulienTruffaut) or discuss this article 
+on [reddit](https://www.reddit.com/r/scala/comments/eulz2j/introducing_error_reporting_in_optics_monocle/).
