@@ -4,7 +4,6 @@ image = "error-reporting.jpg"
 author = "julien truffaut"
 tags = ["scala", "monocle"]
 date = 2020-01-27T00:00:00+00:00
-index = false
 course = "Scala Foundation"
 +++
 
