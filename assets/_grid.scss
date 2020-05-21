@@ -17,6 +17,7 @@
   }
   .grid-reverse {
     grid-template-columns: 3fr 1fr;
+    grid-gap: 2rem 4rem;
   }
   .grid-2 {
     grid-template-columns: 1fr 1fr;

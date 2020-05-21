@@ -1,0 +1,10 @@
+{{ define "main" }}
+<div class = 'page_banner short center' style = 'background-image:url(/images/{{ .Params.image }})'>
+  <h1>{{ upper .Title }}</h1>
+  <p>{{ .Params.description }}</p>
+</div>
+<div class = 'wrap pt_2'>
+  <h2>We'd love to hear from you!</h2>
+  {{ partial "form" . }}
+</div>
+{{ end }}

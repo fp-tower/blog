@@ -11,7 +11,6 @@
   display: flex;
   justify-content: flex-end;
   &_header {
-    position: absolute;
     width: 100%;
     top: 0;
     padding-top: 1rem;
@@ -60,11 +59,15 @@
     height: initial;
   }
   &_item {
+    display: inline-flex;
+    align-items: center;
     text-decoration: none;
     padding: 0.5rem;
     position: relative;
     text-transform: uppercase;
     height: 100%;
+    font-weight: 500;
+    font-size: 0.9rem;
     &:hover {
       opacity: 0.5;
     }
@@ -119,16 +122,19 @@
       right: 0;
       top: 0;
       transform: translateY(0);
-      background-color: $theme;
-      color: $light;
+      background-color: $light;
     }
   }
 }
 
 .footer {
-  background: $dark;
-  color: $light;
+  background: rgba($theme, 0.1);
+  color: $theme;
   padding: 1rem 0;
+  a {
+    font-size: 300;
+    text-decoration: none;
+  }
   &_item {
     text-decoration: none;
     transition: opacity 0.3s ease-out;
@@ -140,9 +146,48 @@
   }
   &_inner {
     display: flex;
+    flex-flow: column;
+  }
+  &_logo {
+    width: 10rem;
+  }
+  &_row {
+    display: flex;
+    width: 100%;
+    padding: 1.5rem;
+  }
+  &_lower {
+    border-top: 0.5px solid $theme;
     align-items: center;
-    flex-flow: row wrap;
     justify-content: space-between;
+  }
+  &_icon {
+    &s{
+      justify-content: center;
+      padding-bottom: 2.5rem
+    }
+    display: inline-flex;
+    align-items: center;
+    overflow: hidden;
+    text-decoration: none;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    position: relative;
+    background-color: $bg;
+    border-radius: 50%;
+    transition: opacity 0.3s $ease;
+    margin: 0 0.25rem;
+    &:hover {
+      opacity: 0.6;
+    }
+    &::after {
+      content: "";
+      width: 1rem;
+      height: 1rem;
+      background-size: 100%;
+      background-repeat: no-repeat;
+    }
   }
 }
 
@@ -167,21 +212,13 @@
   font-size: 0.9rem;
 }
 .excerpt {
-  // box-shadow: 0 0 3rem rgba($dark, 0.12);
   margin: 0.5rem 0;
   position: relative;
-  // border-radius: 1rem;
   overflow: hidden;
   min-height: 20rem;
+  text-align: center;
   cursor: pointer;
 
-  &:first-child {
-    @media screen and (min-width: 667px) {
-      grid-column: 1 / -1;
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-    }
-  }
   a {
     text-decoration: none;
   }
@@ -195,7 +232,8 @@
     padding: 1rem;
   }
   &_link {
-    color: $bg;
+    color: #000;
+    font-weight: 700;
   }
   &_meta {
     opacity: 0.6;
@@ -256,12 +294,21 @@
   }
 } 
 
-.author {
-  display: grid;
-  grid-template-columns: 3rem 1fr;
-  grid-gap: 0.5rem;
-  // align-items: center;
-  &_name {
+.meta {
+  display: inline-flex;
+  flex-flow: row wrap;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+  a {
+    text-decoration: none;
+  }
+  span {
+    display: inline-block;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  &_author {
     text-transform: capitalize;
     font-weight: 400;
     font-size: 1.1rem;
@@ -289,11 +336,18 @@
 .avatar {
   width: 3rem;
   overflow: hidden;
+  display: inline-block;
   img {
     width: 100%;
     border-radius: 50%;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
+  }
+}
+// hide avatars on home page
+.home {
+  .avatar {
+    display: none
   }
 }
 
@@ -400,31 +454,6 @@
   } 
 }
 
-.social {
-  &_icon {
-    display: inline-flex;
-    align-items: center;
-    overflow: hidden;
-    text-decoration: none;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    position: relative;
-    background-color: transparent;
-    transition: opacity 0.3s $ease;
-    margin: 0 0.25rem;
-    &:hover {
-      opacity: 0.6;
-    }
-    &::after {
-      content: "";
-      width: 1rem;
-      height: 1rem;
-      background-size: 100%;
-      background-repeat: no-repeat;
-    }
-  }
-}
 
 $sites:  "reddit", "github", "twitter", "linkedin";
 
@@ -455,5 +484,52 @@ $sites:  "reddit", "github", "twitter", "linkedin";
   border-radius: 0.2rem;
   img {
     max-width: 12.5rem;
+  }
+}
+
+.page {
+  &_banner {
+    min-height: 72vh;
+    max-height: 640px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    padding: 1.5rem;
+    font-size: 1.5rem;
+    &.short {
+      min-height: 36vh;
+      max-height: 480px;
+    }
+    &, * {
+      position: relative;
+      color: $light;
+    }
+    * {
+      z-index: 2;
+    }
+    p {
+      padding: 0.25rem 0;
+      font-weight: 300;
+      max-width: 40rem;
+    }
+    &::before {
+      content: "";
+      position: absolute;
+      background-color: rgba(0,0,0,0.6);
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    }
+  }
+}
+
+.form {
+  display: grid;
+  &_field {
+    padding: 1rem 1.5rem;
+    margin: 0.75rem 0;
   }
 }

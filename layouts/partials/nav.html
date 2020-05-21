@@ -1,8 +1,8 @@
 {{- $url := .RelPermalink }}
-<header class = 'nav_header{{ if .IsHome }} nav_home{{ end }}'>
+<header class = 'nav_header nav_home'>
   <div class = 'nav_top wrap'>
     <a class = 'nav_brand' href='/'>
-      <img src = '/images/logo-white.png' class = 'nav_logo'>
+      <img src = '/images/logo.png' class = 'nav_logo'>
     </a>
     <nav class = 'nav center'>
       {{- range .Site.Data.nav }}

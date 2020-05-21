@@ -2,9 +2,9 @@
   <a href = '{{ .Permalink }}' style='background-image: url(/images/{{ .Params.image }})' class = 'excerpt_thumbnail'></a>
   <section class = 'excerpt_body'>
     <h3>
-      <a href = '{{ .Permalink }}' class = 'excerpt_link'>{{ .Title }}</a>
+      <a href = '{{ .Permalink }}' class = 'excerpt_link'>{{ upper .Title }}</a>
     </h3>
-    <p><a href = '{{ .Permalink }}'>{{ .Summary | truncate 80 }}</a></p>
     {{- partial "meta.html" . }}
+    <p><a href = '{{ .Permalink }}'>{{ .Summary | truncate 120 }}</a></p>
   </section>
 </div>

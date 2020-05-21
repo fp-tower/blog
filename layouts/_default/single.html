@@ -1,13 +1,15 @@
 {{- define "body_class"}}class="single_post"{{ end }}
 {{- define "main" }}
-<div class = 'grid-reverse wrap pt_4'>
-  <div class = 'contents'>
-    <h1>{{ .Title }}</h1>
-    {{ partial "meta.html" . }}
-    <img src = '/images/{{ .Params.image }}' alt = '{{ .Title }}'>
+<div class = 'page_banner' style = 'background-image:url(/images/{{ .Params.image }})'></div>
+<div class = 'grid-reverse wrap pt_2'>
+  <article class = 'contents'>
+    <div class = 'center pb_1'>
+      <h1 class = 'excerpt_title'>{{ .Title }}</h1>
+      {{ partial "meta.html" . }}
+    </div>
     {{- .Content }}
-  </div>
-  <aside class = 'pt_1 aside'>
+  </article>
+  <aside class = 'aside'>
     <div class = 'aside_widget'>
       <h3 class = 'mb_1'>Tags</h3>
       {{- partial "tags.html" . }}
