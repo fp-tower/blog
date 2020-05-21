@@ -1,7 +1,7 @@
 baseURL = "/"
 languageCode = "en"
 title = "fp-tower blog"
-paginate = 7
+paginate = 2
 dynamicURL = "/"
 
 pygmentsCodefences = true
