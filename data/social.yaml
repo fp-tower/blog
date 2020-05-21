@@ -1,8 +1,8 @@
-- name: github
-  link: "https://github.com/julien-truffaut"
-- name: linkedin
-  link: "https://www.linkedin.com/in/julientruffaut/"
 - name: twitter
   link: "https://twitter.com/JulienTruffaut"
+- name: linkedin
+  link: "https://www.linkedin.com/in/julientruffaut/"
 - name: reddit
   link: "https://www.reddit.com/user/julien-truffaut"
+- name: github
+  link: "https://github.com/julien-truffaut"

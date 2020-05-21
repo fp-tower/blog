@@ -1,0 +1,6 @@
+- name: 'Privacy Policy'
+  url: '#'
+- name: '.'
+  url: ''
+- name: 'Terms & Conditions'
+  url: '#'
