@@ -230,6 +230,7 @@
   }
   &_body {
     padding: 1rem;
+    opacity: 0.8;
   }
   &_link {
     color: #000;
@@ -446,6 +447,7 @@
   background-color: $haze;
   text-decoration: none;
   font-size: 0.9rem !important;
+  text-transform: capitalize;
   &:hover {
     background-color: $bg;
     color: $light;
