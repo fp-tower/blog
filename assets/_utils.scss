@@ -33,3 +33,42 @@
   box-shadow: 0 1rem 4rem rgba(0,0,0,0.15);
   max-width: calc(100vw - 3rem);
 }
+
+.separator {
+  width: 1px;
+  height: 100%;
+  background-color: $gray;
+  opacity: 0.4;
+  position: absolute;
+  left: 2rem;
+  + div {
+    margin-left: 5rem;
+  }
+
+}
+
+.column {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  p {
+    img {
+      vertical-align: middle;
+      margin-right: 1rem;
+      width: 1.5rem;
+    }
+  }
+}
+
+.font {
+  &_light {
+    font-weight: 300;
+  }
+  &_semibold {
+    font-weight: 600;
+  }
+  &_bold {
+    font-weight: 700;
+  }
+}

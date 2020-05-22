@@ -1,0 +1,10 @@
+<div class = 'aside_widget'>
+  <h3 class = 'mb_1'>Posts by Topic</h3>
+  {{- partial "tags" . }}
+  {{ $courseID := .Params.course }}
+  {{ $course := index (where $.Site.Data.courses ".name" $courseID) 0 }}
+  <section class = 'course'>
+    <h3>{{ $course.title }}</h3>
+    <p>{{ $course.description | markdownify }}</p>
+  </section>
+</div>

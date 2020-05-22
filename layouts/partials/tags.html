@@ -1,7 +1,7 @@
-{{ with .Params.tags }}
+{{ range $key, $value := $.Site.Taxonomies }}
 <div class = 'tags'>
-  {{ range . }}
-  <a href = '/tags/{{ anchorize . }}' class = 'tag'>{{ . }}</a>
+  {{ range  $value.ByCount }}
+  <a href = '{{ absURL $key }}/{{ (replace .Name "#" "%23") | urlize }}/' class = 'tag'>{{ .Name }}</a>
    {{ end }}
 </div>
 {{ end }}

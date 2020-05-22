@@ -5,5 +5,6 @@ description: |
   
   Functional Programming
 image: "wood-creative-camera-photography.jpg"
+course: "Scala Foundation"
 ---
 

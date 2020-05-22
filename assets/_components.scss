@@ -66,7 +66,7 @@
     position: relative;
     text-transform: uppercase;
     height: 100%;
-    font-weight: 500;
+    font-weight: 700;
     font-size: 0.9rem;
     &:hover {
       opacity: 0.5;
@@ -129,7 +129,7 @@
 
 .footer {
   background: rgba($theme, 0.1);
-  color: $theme;
+  color: $bg;
   padding: 1rem 0;
   a {
     font-size: 300;
@@ -157,7 +157,7 @@
     padding: 1.5rem;
   }
   &_lower {
-    border-top: 0.5px solid $theme;
+    border-top: 0.5px solid rgba($bg, 0.5);
     align-items: center;
     justify-content: space-between;
   }
@@ -271,26 +271,27 @@
 
 .page {
   &-item {
-    height:1.5rem;
-    line-height:0.8em;
-    width: 1.5rem;
     margin: 0.33rem;
-    border-radius: 0.2rem;
-    display: inline-grid;
-    align-items: center;
-    text-align: center;
+    border-radius: 0.1rem;
+    color: $bg;
+    padding: 0 !important;
     &.active {
-      background: $theme;
+      background: $bg;
       color: $light;
-      box-shadow: 0 0 1rem rgba($dark, 0.12);
     }
     &.disabled {
       opacity: 0.5;
     }
   }
   &-link {
+    height: 2rem;
+    width: 2rem;
+    display: inline-grid;
+    align-items: center;
+    text-align: center;
     text-decoration: none;
-    font-size: 0.9rem;
+    font-size: 1rem;
+    font-weight: 600;
   }
 } 
 
@@ -455,7 +456,7 @@
 }
 
 
-$sites:  "reddit", "github", "twitter", "linkedin";
+$sites:  "reddit", "github", "twitter", "linkedin", "youtube", "website";
 
 @each $site in $sites {
   .#{$site} {
@@ -498,6 +499,9 @@ $sites:  "reddit", "github", "twitter", "linkedin";
     background-size: cover;
     padding: 1.5rem;
     font-size: 1.5rem;
+    @media screen and (max-width: 667px) {
+      min-height: 40vh;
+    }
     &.short {
       min-height: 36vh;
       max-height: 480px;
@@ -511,7 +515,7 @@ $sites:  "reddit", "github", "twitter", "linkedin";
     }
     p {
       padding: 0.25rem 0;
-      font-weight: 300;
+      font-weight: 400;
       max-width: 40rem;
     }
     &::before {
@@ -531,5 +535,24 @@ $sites:  "reddit", "github", "twitter", "linkedin";
   &_field {
     padding: 1rem 1.5rem;
     margin: 0.75rem 0;
+    background-color: rgba($blue, 0.16);
+    border: none;
+    font-size: 1rem;
+  }
+  &_button {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    background: $bg;
+    color: $light;
+    font-weight: 700;
+    width: 100%;
+    max-width: 12.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 1.25rem;
+    border: none;
+    margin-top: 1.5rem;
+    cursor: pointer;
+
   }
 }

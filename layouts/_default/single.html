@@ -10,16 +10,7 @@
     {{- .Content }}
   </article>
   <aside class = 'aside'>
-    <div class = 'aside_widget'>
-      <h3 class = 'mb_1'>Tags</h3>
-      {{- partial "tags.html" . }}
-      {{ $courseID := .Params.course }}
-      {{ $course := index (where $.Site.Data.courses ".name" $courseID) 0 }}
-      <section class = 'course'>
-        <h3>{{ $course.title }}</h3>
-        <p>{{ $course.description | markdownify }}</p>
-      </section>
-    </div>
+    {{- partial "sidebar" . }}
   </aside>
 </div>
 {{- end }}
