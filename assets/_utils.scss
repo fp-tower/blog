@@ -50,7 +50,13 @@
   + div {
     margin-left: 5rem;
   }
-
+  @media screen and (max-width: 667px) {
+    display: none;
+    + div {
+      margin-left: 0;
+      text-align: center;
+    }
+  }
 }
 
 .column {
