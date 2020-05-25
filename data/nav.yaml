@@ -1,7 +1,7 @@
 - name: 'courses'
   url: '/'
 - name: 'blog'
-  url: '#'
+  url: '/'
 - name: 'contact us'
   url: '/contact-us/'
 - name: 'jobs'

@@ -13,6 +13,7 @@ pygmentsOptions = "linenos=table"
 [params]
   # signup for an account on formcarry.com or getform.io and replace the endpoint below
   formActionURL = "https://formcarry.com/s/3L7zY4aKd8hc"
+  logoURL = "https://fp-tower.com/"
 
 [markup]
 	defaultMarkdownHandler = "goldmark"
