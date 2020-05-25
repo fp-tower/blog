@@ -184,17 +184,17 @@ function fileClosure() {
     }, 500)
   }
   
-  function fixNav() {
-    window.addEventListener('scroll', function(e) {
-      let position = window.scrollY;
-      if (position > 200) {
-        window.requestAnimationFrame(animateNav); 
-      } else {
-        window.requestAnimationFrame(restoreNav); 
-      }
-    });
-  }
-  nav ? fixNav() : false;
+  // function fixNav() {
+  //   window.addEventListener('scroll', function(e) {
+  //     let position = window.scrollY;
+  //     if (position > 200) {
+  //       window.requestAnimationFrame(animateNav); 
+  //     } else {
+  //       window.requestAnimationFrame(restoreNav); 
+  //     }
+  //   });
+  // }
+  // nav ? fixNav() : false;
   
   const hero = elem('.hero');
   if(hero) {
