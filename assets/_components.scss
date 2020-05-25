@@ -10,8 +10,8 @@
 .nav {
   display: flex;
   justify-content: flex-end;
+  font-family: $font3;
   &_header {
-    position: absolute;
     width: 100%;
     top: 0;
     padding-top: 1rem;
@@ -60,11 +60,18 @@
     height: initial;
   }
   &_item {
+    display: inline-flex;
+    align-items: center;
     text-decoration: none;
     padding: 0.5rem;
     position: relative;
     text-transform: uppercase;
     height: 100%;
+    // font-weight: 700;
+    font-size: 0.9rem;
+    @media screen and (min-width: 769px) {
+      margin: 0 1.5rem;
+    }
     &:hover {
       opacity: 0.5;
     }
@@ -119,16 +126,18 @@
       right: 0;
       top: 0;
       transform: translateY(0);
-      background-color: $theme;
-      color: $light;
+      background-color: $light;
     }
   }
 }
 
 .footer {
-  background: $dark;
-  color: $light;
+  background: rgba($theme, 0.1);
+  color: $bg;
   padding: 1rem 0;
+  a {
+    text-decoration: none;
+  }
   &_item {
     text-decoration: none;
     transition: opacity 0.3s ease-out;
@@ -140,9 +149,54 @@
   }
   &_inner {
     display: flex;
+    flex-flow: column;
+  }
+  &_logo {
+    width: 10rem;
+  }
+  &_row {
+    display: flex;
+    width: 100%;
+    padding: 1.5rem;
+  }
+  &_lower {
+    border-top: 0.5px solid rgba($bg, 0.5);
     align-items: center;
-    flex-flow: row wrap;
     justify-content: space-between;
+    flex-flow: row wrap;
+    span, div {
+      display: inline-block;
+      margin: 1rem 0;
+    }
+  }
+  &_icon {
+    &s{
+      justify-content: center;
+      align-items: center;
+      padding-bottom: 2.5rem
+    }
+    display: inline-flex;
+    align-items: center;
+    overflow: hidden;
+    text-decoration: none;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    position: relative;
+    background-color: $bg;
+    border-radius: 50%;
+    transition: opacity 0.3s $ease;
+    margin: 0 0.25rem;
+    &:hover {
+      opacity: 0.6;
+    }
+    &::after {
+      content: "";
+      width: 1.5rem;
+      height: 1.5rem;
+      background-size: 100%;
+      background-repeat: no-repeat;
+    }
   }
 }
 
@@ -167,21 +221,13 @@
   font-size: 0.9rem;
 }
 .excerpt {
-  // box-shadow: 0 0 3rem rgba($dark, 0.12);
   margin: 0.5rem 0;
   position: relative;
-  // border-radius: 1rem;
   overflow: hidden;
   min-height: 20rem;
+  text-align: center;
   cursor: pointer;
-
-  &:first-child {
-    @media screen and (min-width: 667px) {
-      grid-column: 1 / -1;
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-    }
-  }
+  
   a {
     text-decoration: none;
   }
@@ -193,9 +239,11 @@
   }
   &_body {
     padding: 1rem;
+    opacity: 0.8;
   }
   &_link {
-    color: $bg;
+    color: #000;
+    font-size: 2rem;
   }
   &_meta {
     opacity: 0.6;
@@ -209,8 +257,8 @@
   }
   &_title {
     text-transform: uppercase;
-    font-weight: 600;
-    font-size: 1.33rem;
+    // font-weight: 600;
+    font-size: 2rem;
     a {
       text-decoration: none;
       &:hover {
@@ -233,35 +281,64 @@
 
 .page {
   &-item {
-    height:1.5rem;
-    line-height:0.8em;
-    width: 1.5rem;
     margin: 0.33rem;
-    border-radius: 0.2rem;
-    display: inline-grid;
-    align-items: center;
-    text-align: center;
+    border-radius: 0.1rem;
+    color: $bg;
+    padding: 0 !important;
     &.active {
-      background: $theme;
+      background: $bg;
       color: $light;
-      box-shadow: 0 0 1rem rgba($dark, 0.12);
     }
     &.disabled {
-      opacity: 0.5;
+      display: none;
+    }
+    &:first-child, &:last-child {
+      color: transparent;
+      background-image: url(/images/arrow-right.svg);
+      background-size: 75%;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    &:first-child {
+      transform-origin: 50% 50%;
+      transform: rotate(180deg);
     }
   }
   &-link {
+    height: 2rem;
+    width: 2rem;
+    display: inline-grid;
+    align-items: center;
+    text-align: center;
     text-decoration: none;
-    font-size: 0.9rem;
+    font-size: 1rem;
+    font-weight: 600;
   }
 } 
 
-.author {
-  display: grid;
-  grid-template-columns: 3rem 1fr;
-  grid-gap: 0.5rem;
-  // align-items: center;
-  &_name {
+.meta {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+  flex-direction: column;
+  @media screen and (min-width: 667px) {
+    flex-flow: row wrap;
+  }
+  &_separator {
+    @media screen and (max-width: 666px) {
+      display: none !important;
+    }
+  }
+  a {
+    text-decoration: none;
+  }
+  span {
+    display: inline-block;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  &_author {
     text-transform: capitalize;
     font-weight: 400;
     font-size: 1.1rem;
@@ -289,11 +366,18 @@
 .avatar {
   width: 3rem;
   overflow: hidden;
+  display: inline-block;
   img {
     width: 100%;
     border-radius: 50%;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
+  }
+}
+// hide avatars on home page
+.home {
+  .avatar {
+    display: none
   }
 }
 
@@ -325,135 +409,232 @@
   transform-origin: 50% 50%;
   transition: transform 10s $ease;
   // &_move {
-  //   transform: scale(1.25);
-  // }
-  .wrap {
-    width: 100%;
-  }
-  &_wrap {
-    height: 64vh;
-    max-height: 30rem;
-    position: relative;
-    overflow: hidden;
-    perspective: 700px;
-  }
-  &_banner {
-    font-weight: 700;
-    font-size: 2.5rem;
-    color: $bg;
-    .button {
-      font-size: 0.9rem;
+    //   transform: scale(1.25);
+    // }
+    .wrap {
+      width: 100%;
     }
-    @media screen and (max-width: 992px) {
-      font-size: 2.25rem;
+    &_wrap {
+      height: 64vh;
+      max-height: 30rem;
+      position: relative;
+      overflow: hidden;
+      perspective: 700px;
     }
-    @media screen and (max-width: 667px) {
-      font-size: 1.75rem;
-    }
-  }
-}
-
-.contents {
-  h2, h3, h4 {
-    padding: 2rem 0;
-  }
-  figure, img {
-    display:block;
-  }
-  figure, img {
-    margin: 1.5rem 0;
-    width: 100%;
-  }
-  figure, figcaption {
-    transform-origin: 50% 50%;
-  }
-  figure{
-    @media screen and (min-width: 1024px) {
-      transform: scale(1.1);
-      margin-top: 5rem;
-      margin-bottom: 5rem;
+    &_banner {
+      font-weight: 700;
+      font-size: 2.5rem;
+      color: $bg;
+      .button {
+        font-size: 0.9rem;
+      }
+      @media screen and (max-width: 992px) {
+        font-size: 2.25rem;
+      }
+      @media screen and (max-width: 667px) {
+        font-size: 1.75rem;
+      }
     }
   }
-  figcaption {
-    @media screen and (min-width: 1024px) {
-      transform: scaleX(0.9);
-      margin-left: auto;
-      margin-right: auto;
+  
+  .contents {
+    h2, h3, h4 {
+      padding: 2rem 0;
+    }
+    figure, img {
+      display:block;
+    }
+    figure, img {
+      margin: 1.5rem 0;
+      width: 100%;
+    }
+    figure, figcaption {
+      transform-origin: 50% 50%;
+    }
+    figure{
+      @media screen and (min-width: 1024px) {
+        transform: scale(1.1);
+        margin-top: 5rem;
+        margin-bottom: 5rem;
+      }
+    }
+    figcaption {
+      @media screen and (min-width: 1024px) {
+        transform: scaleX(0.9);
+        margin-left: auto;
+        margin-right: auto;
+      }
     }
   }
-}
-
-.tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.2rem 1rem;
-  border-radius: 0.25rem;
-  background-color: $haze;
-  text-decoration: none;
-  font-size: 0.9rem !important;
-  &:hover {
-    background-color: $bg;
-    color: $light;
-  }
-  &s {
-    text-align: center;
-  } 
-}
-
-.social {
-  &_icon {
+  
+  .tag {
     display: inline-flex;
     align-items: center;
-    overflow: hidden;
+    padding: 0.2rem 1rem;
+    border-radius: 0.25rem;
+    background-color: $haze;
     text-decoration: none;
-    justify-content: center;
-    width: 2rem;
-    height: 2rem;
-    position: relative;
-    background-color: transparent;
-    transition: opacity 0.3s $ease;
-    margin: 0 0.25rem;
+    font-size: 0.9rem !important;
+    text-transform: capitalize;
     &:hover {
-      opacity: 0.6;
+      background-color: $bg;
+      color: $light;
     }
-    &::after {
-      content: "";
-      width: 1rem;
-      height: 1rem;
-      background-size: 100%;
-      background-repeat: no-repeat;
+    &s {
+      text-align: center;
+    } 
+  }
+  
+  
+  $sites:  "github", "twitter", "linkedin", "youtube", "slack";
+  
+  @each $site in $sites {
+    .#{$site} {
+      &::after {
+        background-image: url(/images/#{$site}.svg);
+      }
     }
+  }
+  
+  .aside {
+    // background-color: ;
+    &_widget {
+      position: sticky;
+      top: 7rem;
+    }
+    .tags {
+      text-align: left;
+    }
+  }
+  
+  .course {
+    text-align: center;
+    background-color: $bg;
+    background-image: url(/images/website-background.svg);
+    background-size: cover;
+    padding: 2.5rem 1rem;
+    margin-top: 1.5rem;
+    border-radius: 0.5rem;
+    h3 {
+      font-size: 1.5rem;
+    }
+    * {
+      color: $light;
+    }
+    img {
+      max-width: 12.5rem;
+    }
+    a {
+      display: block;
+      margin: 1rem 0.5rem;
+      background: $bg;
+      text-decoration: none;
+      padding: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+  }
+  
+  .page {
+    &_banner {
+      min-height: 72vh;
+      max-height: 640px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-size: cover;
+      background-position: 50% 50%;
+      padding: 1.5rem;
+      font-size: 1.5rem;
+      margin-top: 5rem;
+      p{
+        font-size: 1.25rem;
+        color: $light;
+        text-align: center;
+      }
+      @media screen and (max-width: 667px) {
+        min-height: 40vh;
+      }
+      &.short {
+        min-height: 48vh;
+        max-height: 480px;
+      }
+      &, * {
+        position: relative;
+        color: $light;
+      }
+      * {
+        z-index: 2;
+      }
+      p {
+        padding: 0.25rem 0;
+        font-weight: 400;
+        max-width: 40rem;
+      }
+      &::before {
+        content: "";
+        position: absolute;
+        background-color: rgba(0,0,0,0.2);
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+      }
+    }
+  }
+  
+  .form {
+    display: grid;
+    // convertkit form
+    &kit-fields {
+      max-width: 30rem;
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+    &kit-powered-by {
+      display: none !important;
+    }
+    // end styles for convertkit form
+    &_field {
+      padding: 1rem 1.5rem;
+      margin: 0.75rem 0;
+      background-color: rgba($blue, 0.16);
+      border: none;
+      font-size: 1rem;
+    }
+    &_button {
+      display: inline-block;
+      margin-left: auto;
+      margin-right: auto;
+      background: $bg;
+      color: $light;
+      font-weight: 700;
+      width: 100%;
+      max-width: 12.5rem;
+      padding: 0.5rem 1rem;
+      font-size: 1.25rem;
+      border: none;
+      margin-top: 1.5rem;
+      cursor: pointer;
+      
+    }
+  }
+  
+.banner {
+  form {
+    width: 100%;
+    max-width: 100vw !important;
+    margin-bottom: -3rem;
+    margin-top: 3rem;
   }
 }
 
-$sites:  "reddit", "github", "twitter", "linkedin";
-
-@each $site in $sites {
-  .#{$site} {
-    &::after {
-      background-image: url(/images/#{$site}.svg);
-    }
-  }
-}
-
-.aside {
-  // background-color: ;
-  &_widget {
-    position: sticky;
-    top: 7rem;
-  }
-  .tags {
-    text-align: left;
-  }
-}
-
-.course {
-  text-align: center;
-  background: $haze;
-  padding: 1.5rem 1rem;
-  margin-top: 1.5rem;
-  border-radius: 0.2rem;
-  img {
-    max-width: 12.5rem;
+.address {
+  font-weight: 600;
+  p {
+    display: flex;
+    flex-flow: row wrap;
   }
 }

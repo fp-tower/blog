@@ -1,28 +1,23 @@
 {{- define "main" }}
-<div class = 'hero_wrap mb_1'>
-  <div class = 'hero'>
-    {{ with .Params.banner }}
-    <div class = 'wrap'>
-      <div class = 'hero_banner'>
-        {{ .text | upper | markdownify }}
-        <br>
-        <a href = 'https://github.com/fp-tower/foundation' class = 'button'>Take the course</a>
-      </div>
-    </div>
-    {{ end }}
-  </div>
+<div class = 'page_banner' style = 'background-image:url(/images/{{ .Params.image }})'>
+  <h1>{{ upper .Title }}</h1>
+  <p>{{ markdownify .Params.description }}</p>
 </div>
-<section class = 'wrap'>
-  <h2 class = 'center mb_1'>Blog Articles</h2>
-  <div class = 'grid-3'>
-    {{- $pages := $.Site.RegularPages }}
-    {{- $nonDrafts := where $pages "Params.index" "!=" "false" }}
-    {{- $nonFuturePosts := where $pages "Date" "<=" "now" }}
-    {{ $paginator := .Paginate (uniq ( union $nonDrafts $nonFuturePosts)) }}
-    {{- range $paginator.Pages }}
-    {{ partial "excerpt.html" . }}
-    {{- end }}
-  </div>
-</section>
-{{- template "_internal/pagination.html" . }}
+<div class = 'grid-reverse wrap pt_2'>
+  <section>
+    <div class = 'grid-2'>
+      {{- $pages := $.Site.RegularPages }}
+      {{- $nonDrafts := where $pages "Params.index" "!=" "false" }}
+      {{- $nonFuturePosts := where $pages "Date" "<=" "now" }}
+      {{ $paginator := .Paginate (uniq ( union $nonDrafts $nonFuturePosts)) }}
+      {{- range $paginator.Pages }}
+      {{ partial "excerpt.html" . }}
+      {{- end }}
+    </div>
+    {{- template "_internal/pagination.html" . }}
+  </section>
+  <aside class = 'aside'>
+    {{- partial "sidebar" . }}
+  </aside>
+</div>
 {{- end }}

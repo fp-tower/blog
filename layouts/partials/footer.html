@@ -1,13 +1,22 @@
 {{ $social := .Site.Data.social }}
 <footer class = 'footer'>
-  <ul class = 'wrap footer_inner'>
-    <div>
-      © 2019-2020 Truffaut Consultancy LTD. All rights reserved
+  <div class = 'wrap footer_inner'>
+    <div class  = 'footer_icons footer_row'>
+      <span class = 'font_semibold'>STAY IN TOUCH</span>&nbsp;&nbsp; 
+      {{ range $social }}
+      <a href = '{{ .link }}' target = '_blank' rel = 'noopener' title = 'follow on {{ .name }}' class = 'footer_icon {{ .name }}'></a>
+      {{ end }}
     </div>
-    <div class  = 'social_icons'>
-    {{ range $social }}
-      <a href = '{{ .link }}' target = '_blank' rel = 'noopener' title = 'follow on {{ .name }}' class = 'social_icon {{ .name }}'></a>
-    {{ end }}
+    <div class = 'footer_row footer_lower'>
+      <span>Copyright {{ now.Format "2006" }} Truffaut Consultancy LTD</span>
+      <a class = 'nav_brand' href='{{ .Site.Params.logoURL }}'>
+        <img src = '/images/logo.png' class = 'footer_logo'>
+      </a>
+      <div class = 'nav_parent'>
+        {{- range .Site.Data.footerLinks }}
+        <a href = '{{ .url }}' class = ''>{{ .name }}</a>
+        {{- end }}
+      </div>
     </div>
-  </ul>
+  </div>
 </footer>

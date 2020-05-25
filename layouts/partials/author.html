@@ -1,0 +1,10 @@
+{{- $author := .Site.Data.author }}
+<span class = 'meta_avatar avatar'>
+  <img src = '/images/{{ $author.avatar }}'>
+</span>
+<span class = 'meta_author'>
+  <a href = '{{ $author.profile }}' target = '_blank' rel = 'noopener' title = '{{ $author.name }} linkedin'>
+    {{ .Params.author }} 
+    <span class = 'meta_tag tag'>FOLLOW</span>
+  </a>
+</span>

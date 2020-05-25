@@ -1,13 +1,19 @@
 baseURL = "/"
 languageCode = "en"
 title = "fp-tower blog"
-paginate = 7
+# change 2 to six (6) to alter pagination
+paginate = 2
 dynamicURL = "/"
 
 pygmentsCodefences = true
 pygmentsCodefencesGuessSyntax = true
 pygmentsUseClasses=true
 pygmentsOptions = "linenos=table"
+
+[params]
+  # signup for an account on formcarry.com or getform.io and replace the endpoint below
+  formActionURL = "https://formcarry.com/s/3L7zY4aKd8hc"
+  logoURL = "https://www.fp-tower.com/"
 
 [markup]
 	defaultMarkdownHandler = "goldmark"

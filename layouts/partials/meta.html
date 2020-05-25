@@ -1,10 +1,6 @@
-{{- $author := .Site.Data.author }}
-<div class = 'author'>
-  <div class = 'avatar'>
-    <img src = '/images/{{ $author.avatar }}'>
-  </div>
-  <div class = 'author_intro'>
-    <h3 class = 'author_name'><a href = '{{ $author.profile }}' target = '_blank' rel = 'noopener' title = '{{ $author.name }} linkedin'>{{ .Params.author }} <span class = 'tag'>follow</span></a></h3>
-    <p class = 'date'>{{  dateFormat "02 Jan" .Date }} . {{ .ReadingTime }} min read</p>
-  </div>
+<div class = 'meta'>
+  <span class = 'meta_date'>{{  dateFormat "January 02, 2006" .Date }}</span>
+  <span class = 'meta_separator'>|</span>
+  {{ partial "author" . }}
 </div>
+

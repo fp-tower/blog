@@ -1,23 +1,19 @@
 {{- define "body_class"}}class="single_post"{{ end }}
 {{- define "main" }}
-<div class = 'grid-reverse wrap pt_4'>
-  <div class = 'contents'>
-    <h1>{{ .Title }}</h1>
-    {{ partial "meta.html" . }}
-    <img src = '/images/{{ .Params.image }}' alt = '{{ .Title }}'>
-    {{- .Content }}
-  </div>
-  <aside class = 'pt_1 aside'>
-    <div class = 'aside_widget'>
-      <h3 class = 'mb_1'>Tags</h3>
-      {{- partial "tags.html" . }}
-      {{ $courseID := .Params.course }}
-      {{ $course := index (where $.Site.Data.courses ".name" $courseID) 0 }}
-      <section class = 'course'>
-        <h3>{{ $course.title }}</h3>
-        <p>{{ $course.description | markdownify }}</p>
-      </section>
+<div class = 'page_banner' style = 'background-image:url(/images/{{ .Params.image }})'></div>
+<div class = 'grid-reverse wrap pt_2'>
+  <article class = 'contents'>
+    <div class = 'center pb_1'>
+      <h1 class = 'excerpt_title'>{{ .Title }}</h1>
+      {{ partial "meta.html" . }}
     </div>
+    {{- .Content }}
+  </article>
+  <aside class = 'aside'>
+    {{- partial "sidebar" . }}
   </aside>
+</div>
+<div class = "banner">
+  {{ partial "newsletter" . }}
 </div>
 {{- end }}

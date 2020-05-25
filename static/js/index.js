@@ -184,23 +184,82 @@ function fileClosure() {
     }, 500)
   }
   
-  function fixNav() {
-    window.addEventListener('scroll', function(e) {
-      let position = window.scrollY;
-      if (position > 200) {
-        window.requestAnimationFrame(animateNav); 
-      } else {
-        window.requestAnimationFrame(restoreNav); 
-      }
-    });
-  }
-  nav ? fixNav() : false;
-
+  // function fixNav() {
+  //   window.addEventListener('scroll', function(e) {
+  //     let position = window.scrollY;
+  //     if (position > 200) {
+  //       window.requestAnimationFrame(animateNav); 
+  //     } else {
+  //       window.requestAnimationFrame(restoreNav); 
+  //     }
+  //   });
+  // }
+  // nav ? fixNav() : false;
+  
   const hero = elem('.hero');
   if(hero) {
     modifyClass(hero, 'hero_move');
   }
   
+  // style next links in pagination
+  (function nextLinksPagination(){
+    const links = elems('.page-link');
+    Array.from(links).filter(function(link){
+      let label = link.getAttribute('aria-label');
+      if(label) {
+        if (label.toLowerCase() === "next" ||  label.toLowerCase() === "previous") {
+          if (link != undefined) {
+            return link;
+          }
+        }    
+      }
+    }).forEach(function(link, index){
+      if (typeof link == 'object') {
+        let innerEl =  link.firstElementChild;
+        if (innerEl) {
+          let label = link.getAttribute('aria-label');
+          innerEl.textContent = label;
+          link.style.width = 'auto';
+          link.style.opacity = '0.7';
+        }
+        let outerEl = link.parentNode;
+        
+        if(containsClass(outerEl, 'disabled')) {
+          let elToHide = outerEl.nextElementSibling;
+          if(index !== 1) {
+            elToHide = outerEl.previousElementSibling;
+          }
+          elToHide.style.display = 'none';
+        }
+      }
+    });
+  })();
+  
+  // submit form
+  (function submitForm(){
+    const contactForm = elem('#contactForm');
+    if(contactForm) {
+      $(function(){
+        $("#contactForm").submit(function(e){
+          e.preventDefault();
+          var href = $(this).attr("action");
+          $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: href,
+            data: $(this).serialize(),
+            success: function(response){
+              if(response.status == "success"){
+                alert("We received your submission, thank you!");
+              }else{
+                alert("An error occured: " + response.message);
+              }
+            }
+          });
+        });
+      });
+    }
+  })()
 }
 
 window.addEventListener('load', fileClosure())

@@ -1,0 +1,7 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<form method = 'POST' class = 'form' action="{{ .Site.Params.formActionURL }}" id="contactForm">
+  <input type = 'text' name = 'Name' class = 'form_field' placeholder = 'Name'>
+  <input type = 'email' name = 'Email' class = 'form_field' placeholder = 'Email Address'>
+  <textarea name = 'Message' class = 'form_field' placeholder = 'Message' rows='8'></textarea>
+  <input type = 'submit' class = 'form_button' value = 'SEND'>
+</form>

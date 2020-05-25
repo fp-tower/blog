@@ -7,7 +7,7 @@
   grid-gap: 2rem;
 }
 
-.grid-2, .grid-3, .grid-4, .grid-auto, .grid-reverse {
+.grid-2, .grid-3, .grid-4, .grid-auto, .grid-reverse, .grid-form {
   @extend %grid;
 }
 
@@ -17,6 +17,7 @@
   }
   .grid-reverse {
     grid-template-columns: 3fr 1fr;
+    grid-gap: 2rem 4rem;
   }
   .grid-2 {
     grid-template-columns: 1fr 1fr;
@@ -26,5 +27,8 @@
   }
   .grid-4 {
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  }
+  .grid-form {
+    grid-template-columns: 3fr 2fr;
   }
 }
