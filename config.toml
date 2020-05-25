@@ -10,6 +10,11 @@ pygmentsCodefencesGuessSyntax = true
 pygmentsUseClasses=true
 pygmentsOptions = "linenos=table"
 
+[params]
+  # signup for an account on formcarry.com or getform.io and replace the endpoint below
+  # formActionURL = "https://formcarry.com/s/XXXXXX"
+  formActionURL = "https://formcarry.com/s/3L7zY4aKd8hc"
+
 [markup]
 	defaultMarkdownHandler = "goldmark"
   [markup.goldmark]

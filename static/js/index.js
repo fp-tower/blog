@@ -195,12 +195,12 @@ function fileClosure() {
     });
   }
   nav ? fixNav() : false;
-
+  
   const hero = elem('.hero');
   if(hero) {
     modifyClass(hero, 'hero_move');
   }
-
+  
   // style next links in pagination
   (function nextLinksPagination(){
     const links = elems('.page-link');
@@ -223,7 +223,7 @@ function fileClosure() {
           link.style.opacity = '0.7';
         }
         let outerEl = link.parentNode;
-  
+        
         if(containsClass(outerEl, 'disabled')) {
           let elToHide = outerEl.nextElementSibling;
           if(index !== 1) {
@@ -235,6 +235,31 @@ function fileClosure() {
     });
   })();
   
+  // submit form
+  (function submitForm(){
+    const contactForm = elem('#contactForm');
+    if(contactForm) {
+      $(function(){
+        $("#contactForm").submit(function(e){
+          e.preventDefault();
+          var href = $(this).attr("action");
+          $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: href,
+            data: $(this).serialize(),
+            success: function(response){
+              if(response.status == "success"){
+                alert("We received your submission, thank you!");
+              }else{
+                alert("An error occured: " + response.message);
+              }
+            }
+          });
+        });
+      });
+    }
+  })()
 }
 
 window.addEventListener('load', fileClosure())

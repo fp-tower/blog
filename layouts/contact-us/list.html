@@ -5,12 +5,12 @@
 </div>
 <div class = 'wrap pt_2 grid-2'>
   <div>
-    <h2>We'd love to hear from you!</h2>
+    <h2>{{ upper "We'd love to hear from you!" }}</h2>
     {{ partial "form" . }}
   </div>
   <div class = 'column'>
     <div class = 'separator'></div>
-    <div>
+    <div class='address'>
       {{ markdownify $.Site.Data.address.contents }}
     </div>
   </div>
