@@ -10,6 +10,7 @@
 .nav {
   display: flex;
   justify-content: flex-end;
+  font-family: $font3;
   &_header {
     width: 100%;
     top: 0;
@@ -66,7 +67,7 @@
     position: relative;
     text-transform: uppercase;
     height: 100%;
-    font-weight: 700;
+    // font-weight: 700;
     font-size: 0.9rem;
     @media screen and (min-width: 769px) {
       margin: 0 1.5rem;
@@ -491,6 +492,9 @@
     padding: 2.5rem 1rem;
     margin-top: 1.5rem;
     border-radius: 0.5rem;
+    h3 {
+      font-size: 1.5rem;
+    }
     * {
       color: $light;
     }
@@ -503,6 +507,8 @@
       background: $bg;
       text-decoration: none;
       padding: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: bold;
       text-transform: uppercase;
     }
   }
@@ -551,6 +557,16 @@
   
   .form {
     display: grid;
+    // convertkit form
+    &kit-fields {
+      max-width: 30rem;
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+    &kit-powered-by {
+      display: none !important;
+    }
+    // end styles for convertkit form
     &_field {
       padding: 1rem 1.5rem;
       margin: 0.75rem 0;
