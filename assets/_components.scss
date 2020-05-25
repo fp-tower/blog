@@ -163,10 +163,16 @@
     border-top: 0.5px solid rgba($bg, 0.5);
     align-items: center;
     justify-content: space-between;
+    flex-flow: row wrap;
+    span, div {
+      display: inline-block;
+      margin: 1rem 0;
+    }
   }
   &_icon {
     &s{
       justify-content: center;
+      align-items: center;
       padding-bottom: 2.5rem
     }
     display: inline-flex;
