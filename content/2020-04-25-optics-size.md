@@ -5,6 +5,7 @@ author = "julien truffaut"
 tags = ["scala", "monocle"]
 date = 2020-04-07T00:00:00+00:00
 course = "Scala Foundation"
+index = false
 +++
 
 In my previous [post](../2020-01-27-introducing-error-reporting-in-optics), I discussed how to change 
