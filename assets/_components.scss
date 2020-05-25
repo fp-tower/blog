@@ -312,10 +312,18 @@
 
 .meta {
   display: inline-flex;
-  flex-flow: row wrap;
   align-items: center;
   margin-left: auto;
   margin-right: auto;
+  flex-direction: column;
+  @media screen and (min-width: 667px) {
+    flex-flow: row wrap;
+  }
+  &_separator {
+    @media screen and (max-width: 666px) {
+      display: none !important;
+    }
+  }
   a {
     text-decoration: none;
   }
