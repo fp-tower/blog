@@ -68,6 +68,9 @@
     height: 100%;
     font-weight: 700;
     font-size: 0.9rem;
+    @media screen and (min-width: 769px) {
+      margin: 0 1.5rem;
+    }
     &:hover {
       opacity: 0.5;
     }
@@ -218,7 +221,7 @@
   min-height: 20rem;
   text-align: center;
   cursor: pointer;
-
+  
   a {
     text-decoration: none;
   }
@@ -282,6 +285,7 @@
     }
     &.disabled {
       opacity: 0.5;
+      display: none;
     }
   }
   &-link {
@@ -381,180 +385,190 @@
   transform-origin: 50% 50%;
   transition: transform 10s $ease;
   // &_move {
-  //   transform: scale(1.25);
-  // }
-  .wrap {
-    width: 100%;
-  }
-  &_wrap {
-    height: 64vh;
-    max-height: 30rem;
-    position: relative;
-    overflow: hidden;
-    perspective: 700px;
-  }
-  &_banner {
-    font-weight: 700;
-    font-size: 2.5rem;
-    color: $bg;
-    .button {
-      font-size: 0.9rem;
+    //   transform: scale(1.25);
+    // }
+    .wrap {
+      width: 100%;
     }
-    @media screen and (max-width: 992px) {
-      font-size: 2.25rem;
-    }
-    @media screen and (max-width: 667px) {
-      font-size: 1.75rem;
-    }
-  }
-}
-
-.contents {
-  h2, h3, h4 {
-    padding: 2rem 0;
-  }
-  figure, img {
-    display:block;
-  }
-  figure, img {
-    margin: 1.5rem 0;
-    width: 100%;
-  }
-  figure, figcaption {
-    transform-origin: 50% 50%;
-  }
-  figure{
-    @media screen and (min-width: 1024px) {
-      transform: scale(1.1);
-      margin-top: 5rem;
-      margin-bottom: 5rem;
-    }
-  }
-  figcaption {
-    @media screen and (min-width: 1024px) {
-      transform: scaleX(0.9);
-      margin-left: auto;
-      margin-right: auto;
-    }
-  }
-}
-
-.tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.2rem 1rem;
-  border-radius: 0.25rem;
-  background-color: $haze;
-  text-decoration: none;
-  font-size: 0.9rem !important;
-  text-transform: capitalize;
-  &:hover {
-    background-color: $bg;
-    color: $light;
-  }
-  &s {
-    text-align: center;
-  } 
-}
-
-
-$sites:  "reddit", "github", "twitter", "linkedin", "youtube", "website";
-
-@each $site in $sites {
-  .#{$site} {
-    &::after {
-      background-image: url(/images/#{$site}.svg);
-    }
-  }
-}
-
-.aside {
-  // background-color: ;
-  &_widget {
-    position: sticky;
-    top: 7rem;
-  }
-  .tags {
-    text-align: left;
-  }
-}
-
-.course {
-  text-align: center;
-  background: $haze;
-  padding: 1.5rem 1rem;
-  margin-top: 1.5rem;
-  border-radius: 0.2rem;
-  img {
-    max-width: 12.5rem;
-  }
-}
-
-.page {
-  &_banner {
-    min-height: 72vh;
-    max-height: 640px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-size: cover;
-    padding: 1.5rem;
-    font-size: 1.5rem;
-    @media screen and (max-width: 667px) {
-      min-height: 40vh;
-    }
-    &.short {
-      min-height: 36vh;
-      max-height: 480px;
-    }
-    &, * {
+    &_wrap {
+      height: 64vh;
+      max-height: 30rem;
       position: relative;
+      overflow: hidden;
+      perspective: 700px;
+    }
+    &_banner {
+      font-weight: 700;
+      font-size: 2.5rem;
+      color: $bg;
+      .button {
+        font-size: 0.9rem;
+      }
+      @media screen and (max-width: 992px) {
+        font-size: 2.25rem;
+      }
+      @media screen and (max-width: 667px) {
+        font-size: 1.75rem;
+      }
+    }
+  }
+  
+  .contents {
+    h2, h3, h4 {
+      padding: 2rem 0;
+    }
+    figure, img {
+      display:block;
+    }
+    figure, img {
+      margin: 1.5rem 0;
+      width: 100%;
+    }
+    figure, figcaption {
+      transform-origin: 50% 50%;
+    }
+    figure{
+      @media screen and (min-width: 1024px) {
+        transform: scale(1.1);
+        margin-top: 5rem;
+        margin-bottom: 5rem;
+      }
+    }
+    figcaption {
+      @media screen and (min-width: 1024px) {
+        transform: scaleX(0.9);
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+  }
+  
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 1rem;
+    border-radius: 0.25rem;
+    background-color: $haze;
+    text-decoration: none;
+    font-size: 0.9rem !important;
+    text-transform: capitalize;
+    &:hover {
+      background-color: $bg;
       color: $light;
     }
-    * {
-      z-index: 2;
-    }
-    p {
-      padding: 0.25rem 0;
-      font-weight: 400;
-      max-width: 40rem;
-    }
-    &::before {
-      content: "";
-      position: absolute;
-      background-color: rgba(0,0,0,0.6);
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
+    &s {
+      text-align: center;
+    } 
+  }
+  
+  
+  $sites:  "github", "twitter", "linkedin", "youtube", "slack";
+  
+  @each $site in $sites {
+    .#{$site} {
+      &::after {
+        background-image: url(/images/#{$site}.svg);
+      }
     }
   }
-}
-
-.form {
-  display: grid;
-  &_field {
-    padding: 1rem 1.5rem;
-    margin: 0.75rem 0;
-    background-color: rgba($blue, 0.16);
-    border: none;
-    font-size: 1rem;
+  
+  .aside {
+    // background-color: ;
+    &_widget {
+      position: sticky;
+      top: 7rem;
+    }
+    .tags {
+      text-align: left;
+    }
   }
-  &_button {
-    display: inline-block;
-    margin-left: auto;
-    margin-right: auto;
-    background: $bg;
-    color: $light;
-    font-weight: 700;
-    width: 100%;
-    max-width: 12.5rem;
-    padding: 0.5rem 1rem;
-    font-size: 1.25rem;
-    border: none;
+  
+  .course {
+    text-align: center;
+    background: $haze;
+    padding: 1.5rem 1rem;
     margin-top: 1.5rem;
-    cursor: pointer;
-
+    border-radius: 0.2rem;
+    img {
+      max-width: 12.5rem;
+    }
+    a {
+      display: block;
+      margin: 1rem 0.5rem;
+      background: $bg;
+      color: $light;
+      text-decoration: none;
+      padding: 0.5rem;
+      text-transform: uppercase;
+    }
   }
-}
+  
+  .page {
+    &_banner {
+      min-height: 72vh;
+      max-height: 640px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-size: cover;
+      padding: 1.5rem;
+      font-size: 1.5rem;
+      @media screen and (max-width: 667px) {
+        min-height: 40vh;
+      }
+      &.short {
+        min-height: 36vh;
+        max-height: 480px;
+      }
+      &, * {
+        position: relative;
+        color: $light;
+      }
+      * {
+        z-index: 2;
+      }
+      p {
+        padding: 0.25rem 0;
+        font-weight: 400;
+        max-width: 40rem;
+      }
+      &::before {
+        content: "";
+        position: absolute;
+        background-color: rgba(0,0,0,0.6);
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+      }
+    }
+  }
+  
+  .form {
+    display: grid;
+    &_field {
+      padding: 1rem 1.5rem;
+      margin: 0.75rem 0;
+      background-color: rgba($blue, 0.16);
+      border: none;
+      font-size: 1rem;
+    }
+    &_button {
+      display: inline-block;
+      margin-left: auto;
+      margin-right: auto;
+      background: $bg;
+      color: $light;
+      font-weight: 700;
+      width: 100%;
+      max-width: 12.5rem;
+      padding: 0.5rem 1rem;
+      font-size: 1.25rem;
+      border: none;
+      margin-top: 1.5rem;
+      cursor: pointer;
+      
+    }
+  }
+  
