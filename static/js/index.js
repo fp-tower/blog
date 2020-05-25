@@ -200,6 +200,40 @@ function fileClosure() {
   if(hero) {
     modifyClass(hero, 'hero_move');
   }
+
+  // style next links in pagination
+  (function nextLinksPagination(){
+    const links = elems('.page-link');
+    Array.from(links).filter(function(link){
+      let label = link.getAttribute('aria-label');
+      if(label) {
+        if (label.toLowerCase() === "next" ||  label.toLowerCase() === "previous") {
+          if (link != undefined) {
+            return link;
+          }
+        }    
+      }
+    }).forEach(function(link, index){
+      if (typeof link == 'object') {
+        let innerEl =  link.firstElementChild;
+        if (innerEl) {
+          let label = link.getAttribute('aria-label');
+          innerEl.textContent = label;
+          link.style.width = 'auto';
+          link.style.opacity = '0.7';
+        }
+        let outerEl = link.parentNode;
+  
+        if(containsClass(outerEl, 'disabled')) {
+          let elToHide = outerEl.nextElementSibling;
+          if(index !== 1) {
+            elToHide = outerEl.previousElementSibling;
+          }
+          elToHide.style.display = 'none';
+        }
+      }
+    });
+  })();
   
 }
 

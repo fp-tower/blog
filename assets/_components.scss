@@ -285,8 +285,18 @@
       color: $light;
     }
     &.disabled {
-      opacity: 0.5;
       display: none;
+    }
+    &:first-child, &:last-child {
+      color: transparent;
+      background-image: url(/images/arrow-right.svg);
+      background-size: 75%;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    &:first-child {
+      transform-origin: 50% 50%;
+      transform: rotate(180deg);
     }
   }
   &-link {
