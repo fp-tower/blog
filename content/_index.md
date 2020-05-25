@@ -3,7 +3,7 @@ title: "Blog"
 description: |
   Latest news and stories about\
   Functional Programming
-image: "wood-creative-camera-photography.jpg"
+image: "homepagebg.jpg"
 course: "Scala Foundation"
 ---
 
