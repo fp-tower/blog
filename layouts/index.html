@@ -1,7 +1,7 @@
 {{- define "main" }}
 <div class = 'page_banner' style = 'background-image:url(/images/{{ .Params.image }})'>
   <h1>{{ upper .Title }}</h1>
-  {{ markdownify .Params.description }}
+  <p>{{ markdownify .Params.description }}</p>
 </div>
 <div class = 'grid-reverse wrap pt_2'>
   <section>
