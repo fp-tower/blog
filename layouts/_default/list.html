@@ -1,6 +1,6 @@
 {{- define "main" }}
 {{ $paginator := .Paginate (where $.Site.RegularPages "Params.index" "!=" "off") }}
-<div class = 'wrap grid-3 pt_5'>
+<div class = 'wrap grid-3 pt_2'>
   {{- range $paginator.Pages  }}
     {{- partial "excerpt.html" . }}
   {{- end }}
