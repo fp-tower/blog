@@ -1,6 +1,7 @@
 baseURL = "/"
 languageCode = "en"
 title = "fp-tower blog"
+# change 2 to six (6) to alter pagination
 paginate = 2
 dynamicURL = "/"
 
