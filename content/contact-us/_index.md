@@ -4,5 +4,6 @@ description = "If you have questions, need any further information about the cou
 type = "contact-us"
 author = "Julien Truffaut"
 course = "Scala Foundation"
+image = "website-background.svg"
 +++
 

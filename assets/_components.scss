@@ -485,10 +485,15 @@
   
   .course {
     text-align: center;
-    background: $haze;
-    padding: 1.5rem 1rem;
+    background-color: $bg;
+    background-image: url(/images/website-background.svg);
+    background-size: cover;
+    padding: 2.5rem 1rem;
     margin-top: 1.5rem;
-    border-radius: 0.2rem;
+    border-radius: 0.5rem;
+    * {
+      color: $light;
+    }
     img {
       max-width: 12.5rem;
     }
@@ -496,7 +501,6 @@
       display: block;
       margin: 1rem 0.5rem;
       background: $bg;
-      color: $light;
       text-decoration: none;
       padding: 0.5rem;
       text-transform: uppercase;
@@ -572,3 +576,11 @@
     }
   }
   
+.banner {
+  form {
+    width: 100%;
+    max-width: 100vw !important;
+    margin-bottom: -3rem;
+    margin-top: 3rem;
+  }
+}
