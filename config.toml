@@ -14,6 +14,11 @@ pygmentsOptions = "linenos=table"
   # signup for an account on formcarry.com or getform.io and replace the endpoint below
   formActionURL = "https://formcarry.com/s/sfUgY5axQYpZ"
   logoURL = "https://www.fp-tower.com/"
+  twitter = "@fptower"
+  logo = "logo.png"
+  author = "Julien Traffaut"
+  # fill in your site baseurl here ... e.g yourdomain.com
+  url = "https://blog.fp-tower.com/" 
 
 [markup]
 	defaultMarkdownHandler = "goldmark"
