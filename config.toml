@@ -1,4 +1,4 @@
-baseURL = "/"
+baseURL = "https://blog.fp-tower.com"
 languageCode = "en"
 title = "fp-tower blog"
 # change 2 to six (6) to alter pagination
