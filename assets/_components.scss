@@ -530,8 +530,8 @@
       background: $bg;
       text-decoration: none;
       padding: 0.5rem;
-      font-size: 0.8rem;
-      font-weight: bold;
+      font-family: $font2;
+      font-size: 1.1rem;
       text-transform: uppercase;
     }
   }
@@ -610,7 +610,7 @@
       margin-right: auto;
       background: $bg;
       color: $light;
-      font-weight: 700;
+      font-family: $font2;
       width: 100%;
       max-width: 12.5rem;
       padding: 0.5rem 1rem;
