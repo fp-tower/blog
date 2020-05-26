@@ -2,8 +2,6 @@
 <meta charset='utf-8'>
 <meta name = 'viewport' content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
 <meta http-equiv = 'X-UA-Compatible' content = 'IE=edge'>
-<meta name = 'SKYPE_TOOLBAR' content = 'SKYPE_TOOLBAR_PARSER_COMPATIBLE' />
-<meta name = 'keywords' content = '{{ .Site.Title }}'>
 {{- if .Params.meta_description }}
 	<meta name="description" content="{{ .Params.meta_description }}">
 {{- end }}
@@ -15,8 +13,8 @@
 {{- $iconsPath :=  "/images/icons/" }}
 <link rel="icon" type="image/png" sizes="32x32" href='{{ absURL (printf "%sfavicon-32x32.png" $iconsPath) }}'>
 <link rel="icon" type="image/png" sizes="16x16" href='{{ absURL (printf "%sfavicon-16x16.png" $iconsPath) }}'>
-<meta property="og:image" content="{{ .Site.BaseURL}}images/logo.png" />
 {{- partial "opengraph" . }}
+<link rel = 'canonical' href = '{{ .Permalink }}'>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
 {{- $options := (dict "targetPath" "main.css" "outputStyle" "expanded" "enableSourceMap" "true") -}}
 {{- $styles := resources.Get "/main.scss" | resources.ToCSS $options | resources.Fingerprint "sha512" }}
