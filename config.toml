@@ -18,7 +18,7 @@ pygmentsOptions = "linenos=table"
   logo = "logo.png"
   author = "Julien Traffaut"
   # fill in your site baseurl here ... e.g yourdomain.com
-  url = "" 
+  url = "https://blog.fp-tower.com/" 
 
 [markup]
 	defaultMarkdownHandler = "goldmark"
