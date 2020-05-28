@@ -62,10 +62,11 @@
       font-size: 1.5rem;
       // text-align: right;
       position: relative;
-      z-index: 99;
+      z-index: 999;
+      padding-left: 1rem;
     }
     &_top {
-      grid-template-columns: 1fr 1.5rem;
+      grid-template-columns: 1fr 2.5rem;
     }
   }
   .footer {
