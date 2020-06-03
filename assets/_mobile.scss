@@ -16,13 +16,7 @@
     &_header {
       padding-top: 0.5rem;
       padding-bottom: 0.5rem;
-    }
-    &_toggle {
-      display: grid;
-      align-items: center;
-      width: 2rem;
-      text-align: center;
-      cursor: pointer;
+      position: absolute;
     }
     &_show {
       transform: translateX(-1.5rem);
@@ -57,16 +51,19 @@
       display: none;
     }
     &_toggle {
+      text-align: center;
+      cursor: pointer;
       display: inline-grid;
       align-items: center;
       font-size: 1.5rem;
-      // text-align: right;
       position: relative;
       z-index: 999;
-      padding-left: 1rem;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
     }
     &_top {
-      grid-template-columns: 1fr 2.5rem;
+      grid-template-columns: 1fr 4.25rem;
+      padding-right: 0;
     }
   }
   .footer {
