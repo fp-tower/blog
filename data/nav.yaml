@@ -1,5 +1,5 @@
-- name: 'courses'
-  url: 'https://www.fp-tower.com'
+- name: 'course'
+  url: 'https://www.fp-tower.com/courses/foundations'
 - name: 'blog'
   url: '/'
 - name: 'contact us'
