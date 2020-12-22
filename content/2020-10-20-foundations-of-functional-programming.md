@@ -1,6 +1,6 @@
 +++
 title = "Foundations of Functional Programming in Scala is available"
-image = "foundations.jpg"
+image = "learn-practical-functional-programming-in-scala.jpg"
 author = "julien truffaut"
 tags = ["scala", "foundations"]
 date = 2020-10-20T00:00:00+00:00
