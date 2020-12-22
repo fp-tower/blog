@@ -39,6 +39,7 @@ Estimated cost £960:
 1. Pop filter and microphone stand £40 (got them from the studio landlord)
 1. [Omnigraffle Pro][omnigraffle] £190
 1. [Screenflow][screenflow] £100
+1. Logo animation £70 (gig on [fiverr][fiverr])
 1. one month studio rental £400
 
 For my second attempt, I decided to rent the smallest and cheapest recording studio close to my home. This way, I could have a quiet place to pop by and store all my recording devices (I am pretty sure my son would have found a way to dismantle my microphone otherwise). I also used the studio as an office for about a month, but it is pretty depressing to work in a room without windows.
