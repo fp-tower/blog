@@ -3,9 +3,8 @@ title = "Comparison of recording setup - Part 1"
 image = "recording-setup-part-1.jpg"
 author = "julien truffaut"
 tags = ["foundations", "video production"]
-date = 2020-12-22T00:00:00+00:00
+date = 2021-01-04T00:00:00+00:00
 course = "Scala Foundation"
-index = false
 +++
 
 In February 2019, I started my biggest side project: a training course on Functional Programing in Scala. I’ve spent an estimated 2,000 hours on this venture and it is still not finished!
