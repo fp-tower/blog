@@ -439,7 +439,7 @@
   
   .contents {
     h2, h3, h4 {
-      padding: 2rem 0;
+      padding: 1rem 0;
     }
     figure, img {
       display:block;
@@ -579,7 +579,7 @@
       &::before {
         content: "";
         position: absolute;
-        background-color: rgba(0,0,0,0.2);
+        background-color: rgba(0,0,0,0);
         top: 0;
         right: 0;
         bottom: 0;

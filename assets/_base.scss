@@ -15,7 +15,7 @@ body {
   max-width: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 16px;
+  font-size: 18px;
   font-family: $font1;
   line-height: 1.5;
   overflow-x: hidden;
@@ -39,14 +39,23 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 400;
   color: #000;
 }
+h1 {
+  font-size: 40px;
+}
+h2 {
+  font-size: 32px;
+}
+h3 {
+  font-size: 26px;
+}
 main  {
   padding-bottom: 3rem;
   flex: 1;
   ul, ol {
-    padding-left: 1.25rem;
+    padding-left: 3rem;
   }
   li {
-    padding: 0.33rem 0;
+    padding: 0.2rem 0;
     line-height: 1.7;
     p {
       padding: 0;
