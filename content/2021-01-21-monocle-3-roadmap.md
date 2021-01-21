@@ -3,9 +3,8 @@ title = "Monocle 3 Roadmap"
 image = "monocle3-banner-102-high-res-01.png"
 author = "julien truffaut"
 tags = ["monocle"]
-date = 2021-01-21T00:00:00+00:00
+date = 2021-01-20T00:00:00+00:00
 course = "Scala Foundation"
-index = false
 +++
 
 Monocle is quite an old Scala library. It was initially conceived in 2014 as a port of the [Haskell Lens](https://hackage.haskell.org/package/lens) library. 
@@ -251,4 +250,4 @@ However, we need your help in testing both the documentation and each Monocle 3 
 
 Have a great day everyone, happy coding.
  
-You can discuss this article on reddit.
+You can discuss this article on [reddit](https://www.reddit.com/r/scala/comments/l1ugt5/monocle_3_roadmap/).
