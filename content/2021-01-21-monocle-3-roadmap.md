@@ -3,7 +3,7 @@ title = "Monocle 3 Roadmap"
 image = "monocle3-banner-102-high-res-01.png"
 author = "julien truffaut"
 tags = ["monocle"]
-date = 2021-01-20T00:00:00+00:00
+date = 2021-01-21T00:00:00+00:00
 course = "Scala Foundation"
 index = false
 +++
@@ -49,7 +49,7 @@ The Monocle 2 API is complex and often requires in-depth knowledge of optics’ 
 *Planned for M1*
 
 In Monocle 2, each optics have several compose functions such as `composeLens`, `composePrism`, `composeOptional` (see full table). This causes two problems:
-1. Verbose optics composition, `address composeOptional index(“home”) composeLens postcode`. Here, more than half of the code consists of composeX methods.
+1. Verbose optics composition, `address composeOptional index("home") composeLens postcode`. Here, more than half of the code consists of composeX methods.
 1. Users need to know that `index` is an `Optional` while `postcode` is a `Lens`.
 
 Additionally, optics composition works very much like function composition; if you have an `Optic[A, B]` and `Optic[B, C]`, you can compose them to get an `Optic[A, C]`. However, in the example below, you will notice that the order of type parameters in `Optic#compose` is more similar to the `andThen` method of `Function1` than to `compose`.
@@ -68,7 +68,7 @@ trait Function1[A, B] {
 Therefore, in Monocle 3, we will deprecate all `composeX` methods in favor of a new overloaded `andThen` method. This change may cause regression in the type inference when composing:
 1. Optics with type parameters, e.g. `some[A]`.
 1. Optics coming from typeclasses such as `index` or `each`.
-However, most of these issues should be fixed by “shortcuts for popular optics” (see below) and Scala 3 which has a much better type inference algorithm. 
+However, most of these issues should be fixed by "shortcuts for popular optics" (see below) and Scala 3 which has a much better type inference algorithm. 
 
 ### 1.2 Shortcuts for popular optics [#978](https://github.com/optics-dev/Monocle/pull/978),
 *Planned for M1*
@@ -81,23 +81,28 @@ Some optics are extremely common, yet it can be challenging to find and figure o
 This is partly a documentation problem, but it is also due to the nature of optics composition. You can compose almost any pair of optics together as long as the output type of the first matches the input type of the second. This freedom makes it difficult to decide which to use. At least, this was the case in Monocle 2. In Monocle 3, we will add methods on all optics for all common cases of optics compositions. For example,
 
 ```scala
-address.some.andThen(postcode)
+case class User(name: String, addresses: List[Address])
 
-// instead of
+case class Address(
+  streetNumber: Int, 
+  postCode: String, 
+  county: Option[String]
+)
+
+val addresses = GenLens[User](_.addresses)
+val county    = GenLens[Address](_.county)
+
+// Monocle 3
+addresses.index(1).andThen(county).some
+
+// Monocle 2
+import monocle.function.Index.index
 import monocle.std.option.some
 
-address.andThen(some).andThen(postcode)
-```
-
-or
-
-```scala
-paymentMethods.index(“Personal”).andThen(expirationDate)
-
-// instead of
-import monocle.function.Index.index
-
-paymentMethods.andThen(index(“Personal”)).andThen(expirationDate)
+addresses
+  .composeOptional(index(1))
+  .composeLens(county)
+  .composePrism(some)
 ```
 
 This change has multiple consequences:
@@ -125,13 +130,13 @@ While this is a linguistic issue, not a bug: `set` implies it can insert a value
 *Planned for M2*
 
 Monocle offers several macros to automate optics creation:
-`GenLens` to focus into a field of a case class.
-`GenPrism` to focus into a branch of an enumeration (`sealed trait`).
-`GenIso` for new types (e.g. `case class Id(value: Long)`) or to see a case class as a tuple of fields.
+* `GenLens` to focus into a field of a case class.
+* `GenPrism` to focus into a branch of an enumeration (`sealed trait`).
+* `GenIso` for new types (e.g. `case class Id(value: Long)`) or to see a case class as a tuple of fields.
 
 This approach presents a few issues:
-Users need to know which macro to use for their use case (barrier to entry)
-The code is still verbose when you need to mix different types of optics, e.g. 
+1. Users need to know which macro to use for their use case (barrier to entry)
+1. The code is still verbose when you need to mix different types of optics, e.g. 
 ```scala
 GenLens[User](_.paymentMethod)                 // focus into field
   .andThen(GenPrism[PaymentMethod, DebitCard]) // focus into a branch
@@ -142,6 +147,8 @@ Instead, Monocle 3 will propose a single macro (to rule them all) and offer an A
 
 ```scala
 Focus[User](_.paymentMethod.as[DebitCard].cardNumber)
+// or with a simpler example
+Focus[User](_.address.streetNumber)
 ```
 
 No need to learn about and differentiate `Lens`, `Prism` or `Iso` anymore. The macro will generate the right type for the path.
@@ -151,6 +158,7 @@ We are considering symbolic operators such as `?` to zoom into an `Option` or `*
 We also plan to integrate `Focus` into `ApplyOptics` to facilitate a more object-oriented syntax: 
 ```scala
 user.focus(_.paymentMethod.as[DebitCard].cardNumber).getOption
+user.focus(_.address.streetNumber).replace(15)
 ```
 This syntax is particularly convenient for single-use optics as you don't need to give the optic name.
 
@@ -172,15 +180,14 @@ To provide a default value in case an `Option` is empty.
 
 ```scala
 case class User(name: String, email: Option[String])
-val email = Focus[User](_.email).withDefault(“no-reply@foo.com”)
-val bob = User(“bob”, None)
+val email = Focus[User](_.email).withDefault("no-reply@foo.com")
+val bob = User("bob", None)
 
 email.get(bob)
-// res: String = “no-reply@foo.com”
-
+// res: String = "no-reply@foo.com"
 
 email.modify(_.toUpperCase)(bob)
-// User(“bob”,Some(“NO-REPLY@FOO.COM”))
+// User("bob",Some("NO-REPLY@FOO.COM"))
 ```
 
 ### 2.2 filter
@@ -192,19 +199,18 @@ case class Item(name: String, quantity: Int, unitPrice: Double)
 
 val order = Order(123, List(
   Item("Lego set", 2, 13.99),
-  Item("Puzzle", 1, 8.99),
-  Item("Book", 3, 11.49)
+  Item("Puzzle"  , 3,  8.99),
+  Item("Book"    , 4, 11.49)
 ))
 
 val expensiveItems = Focus[Order](_.items).filter(_.unitPrice > 10)
 
 expensiveItems.andThen(Focus[Item](_.quantity)).replace(1)(orders)
 // res: Order = Order(123, List(
-//    Item(“Lego set”, 1, 13.99),  
-//    Item("Puzzle", 1, 8.99),
-//    Item(“Book”, 1, 11.49)
+//    Item("Lego set", 1, 13.99), // UPDATED
+//    Item("Puzzle"  , 3,  8.99), 
+//    Item("Book"    , 1, 11.49)  // UPDATED
 //  ))
-
 ```
 
 ## 3. Smaller footprint
@@ -212,7 +218,7 @@ expensiveItems.andThen(Focus[Item](_.quantity)).replace(1)(orders)
 
 Remove rarely-used features and simplify the build to reduce maintainer workload.
 
-1. Drop Scala 2.12
+1. Drop Scala 2.12.
 1. Use `at` with a singleton instead of dedicated methods, e.g., `first` becomes `at(1)`, `second` becomes `at(2)`, and so on.
 1. Deprecate symbolic operators `^|-?`, `|->`, `&|->`, `_1`, `_2`, and so on.
 1. Deprecate `head`, `headOption`, `tail`, `tailOption`, `empty`, `possible`, `reverse`, `last`, `lastOption`, `init`, `initOption`, `curry`, `uncurry`.
@@ -229,15 +235,19 @@ Automate the migration from Monocle 2 to 3 using Scalafix. See this list of API 
 ### 4.2 New website
 *Planned for M3*
 
-The current microsite is too focused on optics internals. We need to rewrite the documentation from scratch with a particular focus on the “Getting Started” section to better onboard new users.
+The current microsite is too focused on optics internals. We need to rewrite the documentation from scratch with a particular focus on the "Getting Started" section to better onboard new users.
 
 ### 4.3 Online course 
 *Late 2021*
 
-FP-Tower is considering a short (3-5 hours) online course around Monocle API and optics fundamentals. If you would be interested in this type of resource, please let us know. 
+FP-Tower is considering a short (3-5 hours) online course around Monocle API and optics fundamentals. If you would be interested in this type of resource, please [let us know](/contact-us/). 
 
 ## Conclusion
-We hope that the Monocle 3 API will be simple enough for Scala developers to reach for whenever they need to access or transform immutable data. We believe that the `Focus` macro and other API simplifications will help us achieve that goal. However, we need your help in testing both the documentation and each Monocle 3 milestone to ensure we don’t miss our targets. 
+We hope that the Monocle 3 API will be simple enough for Scala developers to reach for whenever they need to access or transform immutable data. We believe that the `Focus` macro and other API simplifications will help us achieve that goal. 
+```scala
+user.focus(_.address.streetNumber).replace(15)
+```
+However, we need your help in testing both the documentation and each Monocle 3 milestone to ensure we don’t miss our targets. 
 
 Have a great day everyone, happy coding.
  
