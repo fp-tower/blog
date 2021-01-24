@@ -44,3 +44,10 @@ Then from your post add a `course` field in the front matter that matches whatev
 ```zsh
 hugo new title-of-new-page.md
 ```
+
+## Socia Media Previews
+
+Follow this basic principles.
+
+1. Don't use svgs for social media shares. If a page `image` holds an svg value, use `seoimage` to set a different image.
+2. A good title should be at least 30 characters long and at tost 90 characters long. 
