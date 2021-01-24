@@ -1,10 +1,15 @@
 {{- define "main" }}
-<div class = 'wrap grid-3 pt_2 mt_2'>
-  {{- range (.Paginate .Pages).Pages  }}
-    {{ if ne .Params.index "off" }}
-      {{- partial "excerpt" . }}
-    {{ end }}
-  {{- end }}
+<div class = 'grid-reverse wrap pt_2 mt_2'>
+  <section>
+    <div class = 'grid-2'>
+      {{- range (.Paginate .Pages).Pages  }}
+        {{ if ne .Params.index "off" }}
+          {{- partial "excerpt" . }}
+        {{ end }}
+      {{- end }}
+    </div>
+    {{- template "_internal/pagination.html" . }}
+  </section>
+  {{ partial "sidebar" . }}
 </div>
-{{- template "_internal/pagination.html" . }}
 {{- end }}
