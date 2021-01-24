@@ -1,10 +1,13 @@
-<div class = 'aside_widget'>
-  <h3 class = 'mb_1 font_light'>{{ if eq .Kind "page" }}Tags{{ else }}Posts by Topic{{ end }}</h3>
-  {{- partial "tags" . }}
-  {{ $courseID := .Params.course }}
-  {{ $course := index (where $.Site.Data.courses ".name" $courseID) 0 }}
-  <section class = 'course'>
-    <h3>{{ upper $course.title }}</h3>
-    <p>{{ $course.description | markdownify }}</p>
-  </section>
-</div>
+<aside class = 'aside'>
+  <div class = 'aside_widget'>
+    <h3 class = 'mb_1 font_light'>{{ if eq .Kind "page" }}Tags{{ else }}Posts by Topic{{ end }}</h3>
+    {{- partial "tags" . }}
+    {{- with .Params.course}}
+      {{ $course := index (where $.Site.Data.courses ".name" .) 0 }}
+      <section class = 'course'>
+        <h3>{{ upper $course.title }}</h3>
+        <p>{{ markdownify $course.description }}</p>
+      </section>
+    {{- end }}
+  </div>
+</aside>
