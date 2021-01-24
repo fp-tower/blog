@@ -1,8 +1,9 @@
 {{- define "main" }}
-{{ $paginator := .Paginate (where $.Site.RegularPages "Params.index" "!=" "off") }}
-<div class = 'wrap grid-3 pt_2'>
-  {{- range $paginator.Pages  }}
-    {{- partial "excerpt.html" . }}
+<div class = 'wrap grid-3 pt_2 mt_2'>
+  {{- range (.Paginate .Pages).Pages  }}
+    {{ if ne .Params.index "off" }}
+      {{- partial "excerpt" . }}
+    {{ end }}
   {{- end }}
 </div>
 {{- template "_internal/pagination.html" . }}
