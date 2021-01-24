@@ -1,7 +1,7 @@
 {{ range $key, $value := $.Site.Taxonomies }}
 <div class = 'tags'>
   {{ range  $value.ByCount }}
-  <a href = '{{ absURL $key }}/{{ (replace .Name "#" "%23") | urlize }}/' class = 'tag'>{{ .Name }}</a>
+  <a href = '{{ absURL $key }}/{{ (replace .Name "#" "%23") | urlize }}/' class = 'tag'>{{ replace .Name "-" " " }}</a>
    {{ end }}
 </div>
 {{ end }}
