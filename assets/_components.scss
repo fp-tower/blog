@@ -641,3 +641,22 @@
     flex-flow: row wrap;
   }
 }
+
+// tags archive page
+#taxonomy {
+  .excerpt {
+    &, a {
+      min-height: initial;
+    }
+    background: $haze;
+    &:hover {
+      background: $bg;
+      a {
+        color: $light;
+      }
+    }
+  }
+  .meta {
+    display: none;
+  }
+}

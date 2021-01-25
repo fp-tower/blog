@@ -1,6 +1,6 @@
 {{- define "main" }}
 <div class = 'grid-reverse wrap pt_2 mt_2'>
-  <section>
+  <section id="{{ .Kind }}">
     <div class = 'grid-2'>
       {{- range (.Paginate .Pages).Pages  }}
         {{ if ne .Params.index "off" }}
