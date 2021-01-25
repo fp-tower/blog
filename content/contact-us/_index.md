@@ -5,5 +5,6 @@ type = "contact-us"
 author = "Julien Truffaut"
 course = "Scala Foundation"
 image = "website-background.svg"
+seoimage = "learn-practical-functional-programming-in-scala.jpg"
 +++
 
