@@ -3,7 +3,7 @@
   <section id="{{ .Kind }}">
     <div class = 'grid-2'>
       {{- range (.Paginate .Pages).Pages  }}
-        {{ if ne .Params.index "off" }}
+        {{ if ne .Params.index false }}
           {{- partial "excerpt" . }}
         {{ end }}
       {{- end }}
